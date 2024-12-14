@@ -47,7 +47,7 @@ class FontRenderer:
         self.template_dir = Path(template_dir)
         self.port = port
         self.max_workers = max_workers
-        self.scroll_height = 512
+        self.scroll_height = 400
         self.flask_app = None
         self.server_thread = None
         

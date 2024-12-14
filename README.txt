@@ -42,3 +42,16 @@ do contrastive losses mean anything for us? could we classify the fonts into fam
 Update whole shebang into a data generating parameter
 Create a separate system for training the network once you have the data
 [ ] get it reading from the lorum ipson file
+
+how do I know how long to make lorum_ipsum?
+ensure some overlap of screenshots with scroll_height variable
+- want 1000 images per class
+- screenshots fixed height of 512px, scroll length 400 pixels 
+    - scroll length < screenshot size is good to get some positional variation 
+so we need 1000*40 = 40,000 pixels worth of text
+- font size of 24px with line height of 1.5 mean each line takes 36 pixels
+Number of lines needed ≈ 400,000/36 ≈ 11,111 lines
+
+At an average 
+
+try some different text sizes for data augmentation
