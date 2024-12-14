@@ -12,7 +12,7 @@ def find_similar_fonts(self, query_idx: int, centroids: Dict[int, torch.Tensor],
         
         for idx, centroid in centroids.items():
             if idx != query_idx:
-                sim = F.cosine_similarity(query_centroid.unsqueeze(0), 
+                sim = torch.nn.functional.cosine_similarity(query_centroid.unsqueeze(0), 
                                         centroid.unsqueeze(0))
                 similarities.append((idx, sim.item()))
         
@@ -26,13 +26,14 @@ def main():
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "abcdefghijklmnopqrstuvwxyz",
         "0123456789",
-        "!@#$%^&*()_+-=[]{}|;:,.<>?"
     ]
     
     # Get list of font files
     font_dir = Path("fonts")  # Update with your font directory
     font_paths = list(font_dir.glob("*.ttf"))
     
+    # TODO pass in fonts.txt here as a parameter, ideally add arg to the fonts file and
+    # make the default fonts.txt
     # Create dataset and dataloader
     dataset = FontDataset()#font_paths, text_samples)
     dataloader = DataLoader(dataset, batch_size=32, shuffle=True)

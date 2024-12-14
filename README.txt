@@ -1,9 +1,21 @@
+The readme is a project notes section for now.
+
+# files
+- html files to render the text into fonts
+- flask server to put the baked html onto a webpage
+- training data generator that takes screenshots of those webpages
+- model class with pytorch achitecture
+- training class 
+- some other file to do the similarity computation
+
 Problem Statement: how do we get the most similar fonts to a given font?
 [ ] data augmentation - vary positioning of the text
 [ ] try a clip model of same font different font?
 [ ] train a classifier model and use the average class features to find which classes are closer or more similar to each other and return the top 5
 [ ] do we get anything out of top eigenvectors of the data covariance matrix
 [ ] distance between their mean images.
+
+# files needed
 
 ML steps
 [ ] train a distance model on cifar to make sure the idea works

@@ -34,7 +34,7 @@ def show_font(font_name):
         'name': font_name,
         'url': f'https://fonts.googleapis.com/css2?family={font_name.replace(" ", "+")}&display=swap'
     }
-    return render_template('single_font.html', font=font_data, text=lorem_text)
+    return render_template('templates/single_font.html', font=font_data, text=lorem_text)
 
 def setup_webdriver():
     """Configure Chrome WebDriver with appropriate options"""

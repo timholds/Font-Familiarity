@@ -1,8 +1,4 @@
-import torchvision.transforms as transforms
-import torch
-from torch.utils.data import Dataset, DataLoader
-from PIL import Image, ImageFont, ImageDraw
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 
 class FontDataset:
     def __init__(self, text_samples: List[str], fonts_file='fonts.txt'):
