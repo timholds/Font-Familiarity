@@ -1,0 +1,76 @@
+<!-- templates/single_font.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Font: {{ font.name }}</title>
+    <link href="{{ font.url }}" rel="stylesheet">
+    <style>
+        .text-block {
+            width: 512px;
+            height: 512px;
+            padding: 20px;
+            margin: 0;  /* Remove margin to ensure consistent size */
+            background: white;
+            font-size: 24px;
+            box-sizing: border-box;
+            overflow: hidden;  /* Ensure content doesn't affect size */
+            display: flex;
+            align-items: center;  /* Center content vertically */
+            justify-content: center;  /* Center content horizontally */
+        }
+    </style>
+</head>
+<body style="background-color: #f0f0f0;">
+    <div class="text-block" style="font-family: '{{ font.name }}', sans-serif;">
+        {{ text }}
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Font: {{ font.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={{ font.name.replace(' ', '+') }}:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+        }
+        
+        .text-block {
+            width: {{ font.image_width }}px;
+            height: {{ font.image_height }}px;
+            background: white;
+            font-size: {{ font.font_size }}px;
+            line-height: 1.5;
+            font-family: '{{ font.name }}', sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: scroll;
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        
+        /* Hide scrollbar for Chrome/Safari */
+        .text-block::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .text-content {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-block">
+        <div class="text-content">
+            {{ text }}
+        </div>
+    </div>
+</body>
+</html>
