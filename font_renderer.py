@@ -52,6 +52,10 @@ class FontRenderer:
         self.server_thread = None
         
         # Ensure output directory exists
+        if os.path.exists(self.output_dir):
+            import shutil
+            shutil.rmtree(self.output_dir)
+            
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def _load_fonts(self, filename: str) -> List[str]:
@@ -176,7 +180,7 @@ class FontRenderer:
 
 def main():
     renderer = FontRenderer(
-        fonts_file='fonts.txt',
+        fonts_file='full_fonts_list.txt',
         text_file='lorem_ipsum.txt',
         output_dir='font-images',
         template_dir='templates',
