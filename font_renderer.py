@@ -1,10 +1,11 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from dataclasses import dataclass
 import logging
 from concurrent.futures import ThreadPoolExecutor
 import time
 import os
+import shutil
 
 from flask import Flask, render_template
 from selenium import webdriver
@@ -14,7 +15,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -30,7 +30,6 @@ class FontConfig:
     image_width: int = 512
     image_height: int = 512
     font_size: int = 24
-    samples_per_font: int = 1000
 
 class FontRenderer:
     def __init__(self, 
@@ -39,23 +38,22 @@ class FontRenderer:
                  output_dir: str = 'font-images',
                  template_dir: str = 'templates',
                  port: int = 5000,
-                 max_workers: int = 4):
+                 max_workers: int = 4,
+                 scroll_height: int = 512):
         self.fonts = self._load_fonts(fonts_file)
         self.text = self._load_text(text_file)
         self.output_dir = Path(output_dir)
         self.template_dir = Path(template_dir)
         self.port = port
         self.max_workers = max_workers
+        self.scroll_height = scroll_height
         self.app = self._create_flask_app()
         
         # Ensure output directory exists
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
+            
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Validate template directory
-        if not self.template_dir.exists():
-            raise FileNotFoundError(f"Template directory not found: {template_dir}")
-        if not (self.template_dir / 'single_font.html').exists():
-            raise FileNotFoundError(f"Template file not found: {template_dir}/single_font.html")
 
     def _load_fonts(self, filename: str) -> List[str]:
         """Load and validate font names from file"""
@@ -64,6 +62,7 @@ class FontRenderer:
                 fonts = [line.strip() for line in f if line.strip()]
             if not fonts:
                 raise ValueError("No fonts found in fonts file")
+            logger.info(f"Loaded {len(fonts)} fonts from {filename}")
             return fonts
         except FileNotFoundError:
             raise FileNotFoundError(f"Fonts file not found: {filename}")
@@ -75,30 +74,10 @@ class FontRenderer:
                 text = f.read().strip()
             if not text:
                 raise ValueError("Text file is empty")
-            return text
+            logger.info(f"Loaded {len(text)} characters of text from {filename}")
+            return text * 10  # Repeat text to ensure enough content for scrolling
         except FileNotFoundError:
             raise FileNotFoundError(f"Text file not found: {filename}")
-
-    def _create_flask_app(self) -> Flask:
-        """Create and configure Flask application"""
-        app = Flask(__name__, template_folder=str(self.template_dir.absolute()))
-        
-        @app.route('/font/<font_name>')
-        def render_font(font_name):
-            font_config = FontConfig(
-                name=font_name,
-                google_fonts_url=f'https://fonts.googleapis.com/css2?family={font_name.replace(" ", "+")}&display=swap',
-                output_path=self.output_dir / font_name.lower().replace(' ', '_'),
-                image_width=512,
-                image_height=512
-            )
-            return render_template(
-                'single_font.html',
-                font=font_config,
-                text=self.text
-            )
-        
-        return app
 
     def _setup_webdriver(self) -> webdriver.Chrome:
         """Configure Chrome WebDriver with optimized settings"""
@@ -110,38 +89,66 @@ class FontRenderer:
         chrome_options.add_argument('--disable-dev-shm-usage')
         return webdriver.Chrome(options=chrome_options)
 
+    def _create_flask_app(self) -> Flask:
+        """Create and configure Flask application"""
+        app = Flask(__name__, template_folder=str(self.template_dir.absolute()))
+        
+        @app.route('/font/<font_name>')
+        def render_font(font_name):
+            font_config = FontConfig(
+                name=font_name,
+                google_fonts_url=f'https://fonts.googleapis.com/css2?family={font_name.replace(" ", "+")}&display=swap',
+                output_path=self.output_dir / font_name.lower().replace(' ', '_')
+            )
+            return render_template(
+                'single_font.html',
+                font=font_config,
+                text=self.text
+            )
+        
+        return app
+
     def _capture_font_screenshots(self, font: str, num_samples: int = 1000) -> None:
-        """Capture screenshots for a single font"""
+        """Capture screenshots for a single font with scrolling"""
         driver = self._setup_webdriver()
         font_dir = self.output_dir / font.lower().replace(' ', '_')
         font_dir.mkdir(parents=True, exist_ok=True)
         
         try:
+            # Load the page just once
             url = f"http://localhost:{self.port}/font/{font.replace(' ', '%20')}"
             driver.get(url)
             
-            # Wait for font to load with explicit wait
+            # Wait for font to load
             wait = WebDriverWait(driver, 10)
             text_block = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'text-block'))
             )
             
-            # Generate multiple screenshots with slight variations
+            # Take screenshots with scrolling
+            scroll_position = 0
             for i in range(num_samples):
                 try:
+                    # Scroll to new position
+                    driver.execute_script(f"document.querySelector('.text-block').scrollTop = {scroll_position};")
+                    time.sleep(0.1)  # Small delay to let scroll complete
+                    
+                    # Take screenshot
                     filename = font_dir / f"sample_{i:04d}.png"
                     text_block.screenshot(str(filename))
+                    
+                    # Update scroll position
+                    scroll_position += self.scroll_height
+                    
+                    # Log progress
                     if i % 100 == 0:
                         logger.info(f"Generated {i} samples for font {font}")
+                        
                 except Exception as e:
                     logger.error(f"Error capturing screenshot {i} for font {font}: {e}")
                     
-        except TimeoutException:
-            logger.error(f"Timeout waiting for font to load: {font}")
-        except WebDriverException as e:
-            logger.error(f"WebDriver error for font {font}: {e}")
         except Exception as e:
-            logger.error(f"Unexpected error processing font {font}: {e}")
+            logger.error(f"Error processing font {font}: {e}")
         finally:
             driver.quit()
 
@@ -162,36 +169,6 @@ class FontRenderer:
         
         logger.info("Dataset generation complete")
 
-class FontDataset:
-    """Dataset class for loading and managing font images"""
-    def __init__(self, 
-                 data_dir: str = 'font-images',
-                 transform=None):
-        self.data_dir = Path(data_dir)
-        self.transform = transform
-        self.font_paths = self._index_dataset()
-        
-    def _index_dataset(self):
-        """Index all font images in the dataset"""
-        if not self.data_dir.exists():
-            raise FileNotFoundError(f"Dataset directory not found: {self.data_dir}")
-            
-        font_paths = []
-        for font_dir in self.data_dir.iterdir():
-            if font_dir.is_dir():
-                images = list(font_dir.glob('*.png'))
-                font_paths.extend((img, font_dir.name) for img in images)
-        
-        return font_paths
-    
-    def __len__(self):
-        return len(self.font_paths)
-    
-    def __getitem__(self, idx):
-        img_path, font_name = self.font_paths[idx]
-        # Image loading and transformation logic would go here
-        return img_path, font_name
-
 def main():
     # Initialize and run the font renderer
     renderer = FontRenderer(
@@ -199,7 +176,8 @@ def main():
         text_file='lorem_ipsum.txt',
         output_dir='font-images',
         template_dir='templates',
-        max_workers=4
+        max_workers=4,
+        scroll_height=512
     )
     
     try:
