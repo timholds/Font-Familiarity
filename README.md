@@ -25,7 +25,8 @@ The readme is a project notes section for now.
 [ X ] get the script to render the text on an html page in the correct font
 [ X ] figure out how much data I need
 [ X ] get the screenshots saving with minimal overlap
-[ X ] collect a dataset of 
+[ X ] collect a dataset of 1000
+[  ] add some data augmentations of different font sizes
 
 # ML steps and ideas
 [ ] train a distance model on cifar to make sure the idea works
@@ -62,9 +63,7 @@ so we need 1000*40 = 40,000 pixels worth of text
 - font size of 24px with line height of 1.5 mean each line takes 36 pixels
 Number of lines needed ≈ 400,000/36 ≈ 11,111 lines
 
-I have 500 paragraphs, at an average of 10 lines each, thats 5000 lines or 5000*36 ≈ 180,000 pixels worth of text, which is about half of what we were shooting for. The code should loop back to the beginning at this point but that's fine
-
-At an average 
+I have 500 paragraphs, at an average of 10 lines each, thats 5000 lines or 5000*36 ≈ 180,000 pixels worth of text, which is about half of what we were shooting for. The code should loop back to the beginning and keep screenshotting, which is fine for now
 
 try some different text sizes for data augmentation
 

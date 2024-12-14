@@ -1,0 +1,594 @@
+2024-12-14 01:40:45,350 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:41:08,751 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:42:14,665 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:45:12,866 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:46:38,326 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:46:38,332 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:46:38,664 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:46:38,670 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:46:38,670 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:46:40,671 - INFO - Flask server started
+2024-12-14 01:46:40,672 - INFO - Found 0 already completed fonts
+2024-12-14 01:46:40,672 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:46:41,175 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:46:41,226 - INFO - 127.0.0.1 - - [14/Dec/2024 01:46:41] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:46:41,500 - INFO - 127.0.0.1 - - [14/Dec/2024 01:46:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:46:41,715 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:47:02,855 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:47:18,847 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:47:18,853 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:47:18,858 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:47:18,863 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:47:18,863 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:47:20,861 - INFO - Flask server started
+2024-12-14 01:47:20,862 - INFO - Found 0 already completed fonts
+2024-12-14 01:47:20,862 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:47:21,313 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:47:21,351 - INFO - Received shutdown signal. Completing current font before exiting...
+2024-12-14 01:47:21,354 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10645ed10>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/61a3ea5a169ec5d68c5b492559ab6a68
+2024-12-14 01:47:21,355 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10645f550>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/61a3ea5a169ec5d68c5b492559ab6a68
+2024-12-14 01:47:21,359 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10645fe50>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/61a3ea5a169ec5d68c5b492559ab6a68
+2024-12-14 01:47:21,362 - ERROR - Failed to process font ABeeZee: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 789, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 536, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 507, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1395, in getresponse
+    response.begin()
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 325, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 294, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 184, in generate_dataset
+    self._capture_font_screenshots(font)
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 205, in _capture_font_screenshots
+    driver.get(url)
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 393, in get
+    self.execute(Command.GET, {"url": url})
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 382, in execute
+    response = self.command_executor.execute(driver_command, params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 404, in execute
+    return self._request(command_info[0], url, body=data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 428, in _request
+    response = self._conn.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 143, in request
+    return self.request_encode_body(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 278, in request_encode_body
+    return self.urlopen(method, url, **extra_kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/poolmanager.py", line 443, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 843, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/retry.py", line 474, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/util.py", line 38, in reraise
+    raise value.with_traceback(tb)
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 789, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 536, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 507, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1395, in getresponse
+    response.begin()
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 325, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 294, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2024-12-14 01:47:21,369 - INFO - Received shutdown signal, stopping gracefully...
+2024-12-14 01:47:21,369 - INFO - Dataset generation complete
+2024-12-14 01:47:21,369 - INFO - Process complete
+2024-12-14 01:47:29,302 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:47:29,308 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:47:29,308 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:47:29,313 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:47:29,313 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:47:31,314 - INFO - Flask server started
+2024-12-14 01:47:31,315 - INFO - Found 0 already completed fonts
+2024-12-14 01:47:31,315 - INFO - Resuming from font Acme (index 0)
+2024-12-14 01:47:31,316 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:47:31,749 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:47:31,799 - INFO - 127.0.0.1 - - [14/Dec/2024 01:47:31] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:47:32,154 - INFO - 127.0.0.1 - - [14/Dec/2024 01:47:32] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:47:32,381 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:47:36,038 - INFO - Received shutdown signal. Completing current font before exiting...
+2024-12-14 01:47:36,122 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c856d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot
+2024-12-14 01:47:36,123 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c8b9d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot
+2024-12-14 01:47:36,124 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c956d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot
+2024-12-14 01:47:36,125 - ERROR - Error capturing screenshot 18 for font ABeeZee: HTTPConnectionPool(host='localhost', port=63835): Max retries exceeded with url: /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c95f90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:47:36,125 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c873d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3
+2024-12-14 01:47:36,126 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c86fd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3
+2024-12-14 01:47:36,126 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c87050>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/896670e721a4a3fdd8f34b83addb14d3
+2024-12-14 01:47:36,129 - ERROR - Failed to process font ABeeZee: HTTPConnectionPool(host='localhost', port=63835): Max retries exceeded with url: /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c95f90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 199, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 789, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 495, in _make_request
+    conn.request(
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 441, in request
+    self.endheaders()
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1058, in _send_output
+    self.send(msg)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 996, in send
+    self.connect()
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 279, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 214, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x104c95f90>: Failed to establish a new connection: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 184, in generate_dataset
+    self._capture_font_screenshots(font)
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 224, in _capture_font_screenshots
+    text_block.screenshot(str(filename))
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 347, in screenshot
+    png = self.screenshot_as_png
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 326, in screenshot_as_png
+    return b64decode(self.screenshot_as_base64.encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 315, in screenshot_as_base64
+    return self._execute(Command.ELEMENT_SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 395, in _execute
+    return self._parent.execute(command, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 382, in execute
+    response = self.command_executor.execute(driver_command, params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 404, in execute
+    return self._request(command_info[0], url, body=data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 428, in _request
+    response = self._conn.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 135, in request
+    return self.request_encode_url(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 182, in request_encode_url
+    return self.urlopen(method, url, **extra_kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/poolmanager.py", line 443, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 843, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=63835): Max retries exceeded with url: /session/896670e721a4a3fdd8f34b83addb14d3/element/f.486DA3FC822D3CC44529BE7D9452B9CE.d.990B220ACFC815727D850499F192B33C.e.3/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104c95f90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:47:36,131 - INFO - Received shutdown signal, stopping gracefully...
+2024-12-14 01:47:36,131 - INFO - Dataset generation complete
+2024-12-14 01:47:36,131 - INFO - Process complete
+2024-12-14 01:48:26,055 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:48:26,061 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:48:26,063 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:48:26,068 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:48:26,068 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:48:28,069 - INFO - Flask server started
+2024-12-14 01:48:28,069 - INFO - Found 0 already completed fonts
+2024-12-14 01:48:28,069 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:48:28,580 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:48:28,607 - INFO - 127.0.0.1 - - [14/Dec/2024 01:48:28] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:48:28,889 - INFO - 127.0.0.1 - - [14/Dec/2024 01:48:28] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:48:29,195 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:48:50,379 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:49:12,057 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:49:30,190 - INFO - Received shutdown signal. Completing current font before exiting...
+2024-12-14 01:49:30,192 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'RemoteDisconnected('Remote end closed connection without response')': /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot
+2024-12-14 01:49:30,193 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1041861d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot
+2024-12-14 01:49:30,193 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104194550>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot
+2024-12-14 01:49:30,194 - ERROR - Error capturing screenshot 285 for font ABeeZee: HTTPConnectionPool(host='localhost', port=63876): Max retries exceeded with url: /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104195950>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:49:30,194 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104186950>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/f1329374f3eda92bc6cd2264bcee3013
+2024-12-14 01:49:30,195 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104186cd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/f1329374f3eda92bc6cd2264bcee3013
+2024-12-14 01:49:30,195 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104186850>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/f1329374f3eda92bc6cd2264bcee3013
+2024-12-14 01:49:30,200 - ERROR - Failed to process font ABeeZee: HTTPConnectionPool(host='localhost', port=63876): Max retries exceeded with url: /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104195950>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 199, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 789, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 495, in _make_request
+    conn.request(
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 441, in request
+    self.endheaders()
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1058, in _send_output
+    self.send(msg)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 996, in send
+    self.connect()
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 279, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 214, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x104195950>: Failed to establish a new connection: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 184, in generate_dataset
+    self._capture_font_screenshots(font)
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 224, in _capture_font_screenshots
+    text_block.screenshot(str(filename))
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 347, in screenshot
+    png = self.screenshot_as_png
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 326, in screenshot_as_png
+    return b64decode(self.screenshot_as_base64.encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 315, in screenshot_as_base64
+    return self._execute(Command.ELEMENT_SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 395, in _execute
+    return self._parent.execute(command, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 382, in execute
+    response = self.command_executor.execute(driver_command, params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 404, in execute
+    return self._request(command_info[0], url, body=data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 428, in _request
+    response = self._conn.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 135, in request
+    return self.request_encode_url(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 182, in request_encode_url
+    return self.urlopen(method, url, **extra_kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/poolmanager.py", line 443, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 843, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=63876): Max retries exceeded with url: /session/f1329374f3eda92bc6cd2264bcee3013/element/f.6FE2EA47CB2C33327B57329CD24D46A5.d.BA0CC7ECA194356730EBE0FA647B1526.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x104195950>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:49:30,202 - INFO - Received shutdown signal, stopping gracefully...
+2024-12-14 01:49:30,202 - INFO - Dataset generation complete
+2024-12-14 01:49:30,202 - INFO - Process complete
+2024-12-14 01:49:32,927 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:49:32,933 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:49:32,944 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:49:32,951 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:49:32,951 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:49:34,949 - INFO - Flask server started
+2024-12-14 01:49:34,950 - INFO - Found 0 already completed fonts
+2024-12-14 01:49:34,950 - INFO - Resuming from font Acme (index 0)
+2024-12-14 01:49:34,950 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:49:35,410 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:49:35,454 - INFO - 127.0.0.1 - - [14/Dec/2024 01:49:35] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:49:35,703 - INFO - 127.0.0.1 - - [14/Dec/2024 01:49:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:49:35,993 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:49:57,304 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:50:18,595 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:50:40,000 - INFO - Generated 300/1000 samples for font ABeeZee
+2024-12-14 01:50:50,053 - INFO - Received shutdown signal. Completing current font before exiting...
+2024-12-14 01:50:50,055 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'RemoteDisconnected('Remote end closed connection without response')': /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot
+2024-12-14 01:50:50,056 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022e0250>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot
+2024-12-14 01:50:50,056 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022e1290>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot
+2024-12-14 01:50:50,057 - ERROR - Error capturing screenshot 348 for font ABeeZee: HTTPConnectionPool(host='localhost', port=63920): Max retries exceeded with url: /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022e1e50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:50:50,057 - WARNING - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022d7550>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/d358a8f9cb5b5cf0de55eca028f541aa
+2024-12-14 01:50:50,058 - WARNING - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022d3710>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/d358a8f9cb5b5cf0de55eca028f541aa
+2024-12-14 01:50:50,058 - WARNING - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022d26d0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/d358a8f9cb5b5cf0de55eca028f541aa
+2024-12-14 01:50:50,062 - ERROR - Failed to process font ABeeZee: HTTPConnectionPool(host='localhost', port=63920): Max retries exceeded with url: /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022e1e50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 199, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 789, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 495, in _make_request
+    conn.request(
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 441, in request
+    self.endheaders()
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1298, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 1058, in _send_output
+    self.send(msg)
+  File "/opt/homebrew/Cellar/python@3.11/3.11.10/Frameworks/Python.framework/Versions/3.11/lib/python3.11/http/client.py", line 996, in send
+    self.connect()
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 279, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connection.py", line 214, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x1022e1e50>: Failed to establish a new connection: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 184, in generate_dataset
+    logger.info("Received shutdown signal, stopping gracefully...")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font_renderer.py", line 224, in _capture_font_screenshots
+    )
+      
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 347, in screenshot
+    png = self.screenshot_as_png
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 326, in screenshot_as_png
+    return b64decode(self.screenshot_as_base64.encode("ascii"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 315, in screenshot_as_base64
+    return self._execute(Command.ELEMENT_SCREENSHOT)["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webelement.py", line 395, in _execute
+    return self._parent.execute(command, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/webdriver.py", line 382, in execute
+    response = self.command_executor.execute(driver_command, params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 404, in execute
+    return self._request(command_info[0], url, body=data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/selenium/webdriver/remote/remote_connection.py", line 428, in _request
+    response = self._conn.request(method, url, body=body, headers=headers, timeout=self._client_config.timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 135, in request
+    return self.request_encode_url(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/_request_methods.py", line 182, in request_encode_url
+    return self.urlopen(method, url, **extra_kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/poolmanager.py", line 443, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 873, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/connectionpool.py", line 843, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/Users/timholdsworth/code/font-familiarity/font-env/lib/python3.11/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=63920): Max retries exceeded with url: /session/d358a8f9cb5b5cf0de55eca028f541aa/element/f.F9708A2EB8AA226CDE14CFDE9B45EB27.d.CB0CA542DE11350C9ECD87C52E19936D.e.2/screenshot (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1022e1e50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2024-12-14 01:50:50,065 - INFO - Received shutdown signal, stopping gracefully...
+2024-12-14 01:50:50,065 - INFO - Dataset generation complete
+2024-12-14 01:50:50,065 - INFO - Process complete
+2024-12-14 01:50:51,641 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:50:51,646 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:50:51,662 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:50:51,667 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:50:51,667 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:50:53,667 - INFO - Flask server started
+2024-12-14 01:50:53,668 - INFO - Found 0 already completed fonts
+2024-12-14 01:50:53,668 - INFO - Attempting to resume from font: 'Acme'
+2024-12-14 01:50:53,668 - ERROR - Could not find font 'Acme' in fonts list
+2024-12-14 01:50:53,668 - INFO - First few available fonts: ABeeZee, Abel, Abril Fatface, Aclonica
+2024-12-14 01:50:53,669 - INFO - Resume font (normalized): 'acme'
+2024-12-14 01:50:53,669 - INFO - Available normalized fonts (first 5): 'abeezee', 'abel', 'abril fatface', 'aclonica'
+2024-12-14 01:50:53,669 - INFO - Process complete
+2024-12-14 01:53:03,739 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:53:03,745 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:53:03,745 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:53:03,750 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:53:03,750 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:53:05,751 - INFO - Flask server started
+2024-12-14 01:53:05,751 - INFO - Found 0 already completed fonts
+2024-12-14 01:53:05,752 - INFO - Will process 4 fonts starting with: ABeeZee
+2024-12-14 01:53:05,752 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:53:06,215 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:53:06,261 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:06] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:53:06,533 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:53:06,841 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:53:08,894 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-14 01:53:08,899 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:53:08,900 - INFO - Starting dataset generation for 4 fonts
+2024-12-14 01:53:08,904 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:53:08,904 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:53:10,903 - INFO - Flask server started
+2024-12-14 01:53:10,904 - INFO - Found 0 already completed fonts
+2024-12-14 01:53:10,904 - INFO - Will process 4 fonts starting with: ABeeZee
+2024-12-14 01:53:10,904 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-14 01:53:11,313 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:53:11,359 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:11] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:53:11,654 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:11] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:53:11,963 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:53:33,193 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:53:37,583 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:53:37,589 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:53:37,594 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:53:37,598 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:53:37,598 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:53:39,600 - INFO - Flask server started
+2024-12-14 01:53:39,601 - INFO - Found 0 already completed fonts
+2024-12-14 01:53:39,601 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:53:39,601 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:53:40,043 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:53:40,097 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:40] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:53:40,367 - INFO - 127.0.0.1 - - [14/Dec/2024 01:53:40] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:53:40,585 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:54:01,823 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:54:23,022 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:54:44,209 - INFO - Generated 300/1000 samples for font ABeeZee
+2024-12-14 01:54:53,839 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:54:53,845 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:54:53,858 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:54:53,863 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:54:53,864 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:54:55,861 - INFO - Flask server started
+2024-12-14 01:54:55,862 - INFO - Found 0 already completed fonts
+2024-12-14 01:54:55,862 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:54:55,862 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:54:56,369 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:54:56,398 - INFO - 127.0.0.1 - - [14/Dec/2024 01:54:56] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:54:56,671 - INFO - 127.0.0.1 - - [14/Dec/2024 01:54:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:54:56,971 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:55:18,186 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:55:23,330 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:55:23,336 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:55:23,341 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:55:23,345 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:55:23,345 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:55:25,345 - INFO - Flask server started
+2024-12-14 01:55:25,346 - INFO - Found 0 already completed fonts
+2024-12-14 01:55:25,346 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:55:25,346 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:55:25,773 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:55:25,820 - INFO - 127.0.0.1 - - [14/Dec/2024 01:55:25] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:55:26,092 - INFO - 127.0.0.1 - - [14/Dec/2024 01:55:26] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:55:26,287 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:55:37,416 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:55:48,885 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:55:51,938 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:55:51,944 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:55:51,953 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:55:51,958 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:55:51,958 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:55:53,959 - INFO - Flask server started
+2024-12-14 01:55:53,959 - INFO - Found 0 already completed fonts
+2024-12-14 01:55:53,959 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:55:53,959 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:55:54,361 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:55:54,416 - INFO - 127.0.0.1 - - [14/Dec/2024 01:55:54] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:55:54,696 - INFO - 127.0.0.1 - - [14/Dec/2024 01:55:54] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:55:54,905 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:56:05,420 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:56:15,737 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:56:24,458 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:56:24,464 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:56:24,475 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:56:24,480 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:56:24,480 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:56:26,479 - INFO - Flask server started
+2024-12-14 01:56:26,480 - INFO - Found 0 already completed fonts
+2024-12-14 01:56:26,480 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:56:26,481 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:56:26,906 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:56:26,965 - INFO - 127.0.0.1 - - [14/Dec/2024 01:56:26] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:56:27,261 - INFO - 127.0.0.1 - - [14/Dec/2024 01:56:27] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:56:27,452 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:56:38,929 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:56:50,270 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:57:01,750 - INFO - Generated 300/1000 samples for font ABeeZee
+2024-12-14 01:57:13,233 - INFO - Generated 400/1000 samples for font ABeeZee
+2024-12-14 01:57:24,696 - INFO - Generated 500/1000 samples for font ABeeZee
+2024-12-14 01:57:36,229 - INFO - Generated 600/1000 samples for font ABeeZee
+2024-12-14 01:57:38,079 - INFO - Loaded 707 fonts from full_fonts_list.txt
+2024-12-14 01:57:38,084 - INFO - Text stats: 164731 words, 1116006 chars
+2024-12-14 01:57:38,111 - INFO - Starting dataset generation for 707 fonts
+2024-12-14 01:57:38,116 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-14 01:57:38,116 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-14 01:57:40,115 - INFO - Flask server started
+2024-12-14 01:57:40,116 - INFO - Found 0 already completed fonts
+2024-12-14 01:57:40,116 - INFO - Will process 707 fonts starting with: ABeeZee
+2024-12-14 01:57:40,116 - INFO - Processing font 1/707: ABeeZee (overall 1/707)
+2024-12-14 01:57:40,633 - INFO - Loading URL: http://localhost:5000/font/ABeeZee
+2024-12-14 01:57:40,665 - INFO - 127.0.0.1 - - [14/Dec/2024 01:57:40] "GET /font/ABeeZee HTTP/1.1" 200 -
+2024-12-14 01:57:40,920 - INFO - 127.0.0.1 - - [14/Dec/2024 01:57:40] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-14 01:57:41,122 - INFO - Generated 0/1000 samples for font ABeeZee
+2024-12-14 01:57:52,597 - INFO - Generated 100/1000 samples for font ABeeZee
+2024-12-14 01:58:04,109 - INFO - Generated 200/1000 samples for font ABeeZee
+2024-12-14 01:58:15,728 - INFO - Generated 300/1000 samples for font ABeeZee
+2024-12-14 01:58:27,309 - INFO - Generated 400/1000 samples for font ABeeZee
