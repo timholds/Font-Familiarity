@@ -47,7 +47,7 @@ how do I know how long to make lorum_ipsum?
 ensure some overlap of screenshots with scroll_height variable
 - want 1000 images per class
 - screenshots fixed height of 512px, scroll length 400 pixels 
-    - scroll length < screenshot size is good to get some positional variation 
+    - scroll length < screenshot size is good to get some positional variation. and we can looop through the text multiple times and the positions will be in a different place 
 so we need 1000*40 = 40,000 pixels worth of text
 - font size of 24px with line height of 1.5 mean each line takes 36 pixels
 Number of lines needed ≈ 400,000/36 ≈ 11,111 lines
@@ -55,3 +55,5 @@ Number of lines needed ≈ 400,000/36 ≈ 11,111 lines
 At an average 
 
 try some different text sizes for data augmentation
+
+used this repo https://github.com/honeysilvas/google-fonts to get a full list of fonts and asked claude to put each font on it's own line, which handled the two word fonts pretty nicely
