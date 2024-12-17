@@ -116,7 +116,7 @@ class FontRenderer:
             time.sleep(2)  # Wait for server to start
             logger.info("Flask server started")
 
-    def _capture_font_screenshots(self, font: str, num_samples: int = 1000) -> None:
+    def _capture_font_screenshots(self, font: str, num_samples: int = 10) -> None:
         driver = None
         try:
             driver = self._setup_webdriver()
