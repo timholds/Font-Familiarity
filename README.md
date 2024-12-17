@@ -73,3 +73,11 @@ Used this website to generate a bunch of text https://lipsumhub.com/?type=paragr
 
 Did it a few times and grabbed some different text
 used this repo https://github.com/honeysilvas/google-fonts to get a full list of fonts and asked claude to put each font on it's own line, which handled the two word fonts pretty nicely
+
+challenge - 50GB of image data is too big to upload past Github 5GB limit
+- try 100 images per class instead of 1000
+- try resizing to 256x256 instead of 512
+- save the images out as jpeg instead of png and so some compression
+
+TODO experiment with different image sizes and compression levels
+TODO try saving images in greyscale
