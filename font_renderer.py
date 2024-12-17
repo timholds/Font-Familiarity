@@ -31,7 +31,7 @@ class FontConfig:
     image_width: int = 512
     image_height: int = 512
     font_size: int = 24
-    samples_per_font: int = 1000
+    samples_per_font: int = 10
 
 class FontRenderer:
     def __init__(self, 
@@ -55,7 +55,7 @@ class FontRenderer:
         if os.path.exists(self.output_dir):
             import shutil
             shutil.rmtree(self.output_dir)
-            
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def _load_fonts(self, filename: str) -> List[str]:
@@ -180,9 +180,9 @@ class FontRenderer:
 
 def main():
     renderer = FontRenderer(
-        fonts_file='full_fonts_list.txt',
+        fonts_file='fonts.txt',
         text_file='lorem_ipsum.txt',
-        output_dir='font-images',
+        output_dir='font-images2',
         template_dir='templates',
         max_workers=1
     )
