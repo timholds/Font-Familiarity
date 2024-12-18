@@ -5,6 +5,8 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 import time
 import os
+from PIL import Image
+import io
 
 from flask import Flask, render_template
 from selenium import webdriver
@@ -40,13 +42,16 @@ class FontRenderer:
                  output_dir: str = 'font-images',
                  template_dir: str = 'templates',
                  port: int = 5000,
-                 max_workers: int = 1):  # Reduced to 1 for stability
+                 image_size: tuple = (256, 256),  # Reduced from 512x512
+                 image_quality: int = 80):        # JPEG quality (0-100)):  # Reduced to 1 for stability
         self.fonts = self._load_fonts(fonts_file)
         self.text = self._load_text(text_file)
         self.output_dir = Path(output_dir)
         self.template_dir = Path(template_dir)
         self.port = port
-        self.max_workers = max_workers
+
+        self.image_size = image_size
+        self.image_quality = image_quality
         self.scroll_height = 400
         self.flask_app = None
         self.server_thread = None
@@ -116,50 +121,81 @@ class FontRenderer:
             time.sleep(2)  # Wait for server to start
             logger.info("Flask server started")
 
-    def _capture_font_screenshots(self, font: str, num_samples: int = 10) -> None:
+    def _save_optimized_screenshot(self, element, filename: Path, format='JPEG') -> None:
+        """Take and save an optimized screenshot"""
+        # Get screenshot as PNG bytes
+        png_data = element.screenshot_as_png
+        
+        # Open with Pillow
+        with Image.open(io.BytesIO(png_data)) as img:
+            # Convert to grayscale (since we're dealing with text)
+            img = img.convert('L')
+            
+            # Resize if needed
+            if img.size != self.image_size:
+                img = img.resize(self.image_size, Image.Resampling.LANCZOS)
+            
+            # Save with compression
+            if format.upper() == 'JPEG':
+                img.save(filename, format=format, quality=self.image_quality, optimize=True)
+            elif format.upper() == 'PNG':
+                img.save(filename, format=format, optimize=True)
+            else:
+                raise ValueError(f"Unsupported format: {format}")
+            
+    def _capture_font_screenshots(self, font: str, num_samples: int = 1000) -> None:
+        """Capture screenshots for a single font with scrolling"""
         driver = None
         try:
             driver = self._setup_webdriver()
             font_dir = self.output_dir / font.lower().replace(' ', '_')
             font_dir.mkdir(parents=True, exist_ok=True)
             
-            # Load the page
             url = f"http://localhost:{self.port}/font/{font.replace(' ', '%20')}"
             logger.info(f"Loading URL: {url}")
             driver.get(url)
             
-            # Wait for font to load
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 10, .1)
+            container = wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'container'))
+            )
             text_block = wait.until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'text-block'))
             )
             
-            logger.info(f"Starting screenshots for font: {font}")
-            scroll_position = 0
+            # Get total height of text
+            total_height = driver.execute_script(
+                "return document.querySelector('.text-block').scrollHeight"
+            )
+            
+            content_height = total_height - self.image_size[1]
+            if content_height <= 0:
+                raise ValueError(f"Not enough text content for font {font}")
+                
+            scroll_step = content_height / (num_samples - 1)
             
             for i in range(num_samples):
                 try:
-                    # Scroll and wait
+                    # Calculate scroll position
+                    scroll_position = int(i * scroll_step)
+                    
+                    # Scroll to position
                     driver.execute_script(
-                        f"document.querySelector('.text-block').scrollTop = {scroll_position};"
+                        f"document.querySelector('.text-block').style.transform = 'translateY(-{scroll_position}px)';"
                     )
                     time.sleep(0.1)
                     
-                    # Take screenshot
-                    filename = font_dir / f"sample_{i:04d}.png"
-                    text_block.screenshot(str(filename))
-                    
-                    # Update scroll position
-                    scroll_position += self.scroll_height
+                    # Take and save optimized screenshot
+                    filename = font_dir / f"sample_{i:04d}.jpg"  # Using .jpg extension
+                    self._save_optimized_screenshot(container, filename)
                     
                     if i % 100 == 0:
-                        logger.info(f"Generated {i} samples for font {font}")
+                        logger.info(f"Generated {i}/{num_samples} samples for font {font}")
                         
                 except Exception as e:
                     logger.error(f"Error capturing screenshot {i} for font {font}: {e}")
+                    raise
                     
-        except Exception as e:
-            logger.error(f"Error processing font {font}: {e}")
         finally:
             if driver:
                 driver.quit()
@@ -180,11 +216,12 @@ class FontRenderer:
 
 def main():
     renderer = FontRenderer(
-        fonts_file='fonts.txt',
+        fonts_file='full_fonts.txt',
         text_file='lorem_ipsum.txt',
         output_dir='font-images2',
         template_dir='templates',
-        max_workers=1
+        image_size=(256, 256),  # Smaller size
+        image_quality=10
     )
     
     try:
