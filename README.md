@@ -83,18 +83,23 @@ TODO experiment with different image sizes and compression levels
 TODO try saving images in greyscale
 
 ## Image parameters vs filesize 
-|Filesize  | Compression    | Resolution     | Container | Quality   |
-| -------  | -------------- | -------------- | --------- | -------   |
-~1 kb      | compression 10 | image size 128 |    128    |too zoomed |
-2-3kb      | compression 10 | image size 256 |    128    |too zoomed |
-4-5kb      | compression 10 | image size 256 |    256    |           |
-7-8kb      | compression 20 | image size 256 |    256    |           |
-12-13kb    | compression 10 | image size 512 |    256    |           |
-15-16kb    | compression 20 | image size 512 |    256    |           |
-4-5kb      | compression 10 | image size 256 |    512    | terrible  |
-__         | compression 20 | image size 256 |    512    |           |
-18-20kb    | compression 10 | image size 512 |    512    | too wide  |
-__         | compression 20 | image size 512 |    512    |  |
+|Filesize  | Compression    | Resolution     | Container | Quality      |
+| -------  | -------------- | -------------- | --------- | -------      |
+~1 kb      | compression 10 | image size 128 |    128    |  too zoomed  |
+2-3kb      | compression 10 | image size 256 |    128    |  too zoomed  |
+| | | | |
+1-2kb      | compression 10 | image size 128 |    256    |  too blurry  |
+3-4kb      | compression 50 | image size 128 |    256    |    blurry    |
+| | | | |
+4-5kb      | compression 10 | image size 256 |    256    |blur, passable|
+7-8kb      | compression 20 | image size 256 |    256    |    decent    |
+11-13kb    | compression 50 | image size 256 |    256    |     good     |
+| | | | |
+12-13kb    | compression 10 | image size 512 |    256    |              |
+15-16kb    | compression 20 | image size 512 |    256    |              |
+| | | | |
+4-5kb      | compression 10 | image size 256 |    512    |  too wide    |
+18-20kb    | compression 10 | image size 512 |    512    |  too wide    |
 
 
 ideally we want to add the downstream ML objective to this table since that is the actual tradeoff we care about 

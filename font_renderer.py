@@ -220,8 +220,8 @@ def main():
         text_file='lorem_ipsum.txt',
         output_dir='font-images2',
         template_dir='templates',
-        #image_size=(256, 256),  # Smaller size
-        image_size=(128, 128),  # Smaller size
+        image_size=(256, 256),  # Smaller size
+        #image_size=(128, 128),  # Smaller size
         image_quality=10
     )
     
