@@ -1,0 +1,51 @@
+2024-12-17 17:22:35,604 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-17 17:22:35,604 - INFO - Text stats: 372002 chars, approximately 14880 lines
+2024-12-17 17:22:35,604 - INFO - Starting dataset generation for 4 fonts
+2024-12-17 17:22:35,605 - ERROR - Error during dataset generation: name 'Thread' is not defined
+2024-12-17 17:22:50,607 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-17 17:22:50,607 - INFO - Text stats: 372002 chars, approximately 14880 lines
+2024-12-17 17:22:50,608 - INFO - Starting dataset generation for 4 fonts
+2024-12-17 17:22:50,609 - ERROR - Error during dataset generation: name 'RequestException' is not defined
+2024-12-17 17:23:52,135 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-17 17:23:52,135 - INFO - Text stats: 372002 chars, approximately 14880 lines
+2024-12-17 17:23:52,135 - INFO - Starting dataset generation for 4 fonts
+2024-12-17 17:23:52,138 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-17 17:23:52,138 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-17 17:23:52,139 - INFO - 127.0.0.1 - - [17/Dec/2024 17:23:52] "GET /health HTTP/1.1" 200 -
+2024-12-17 17:23:52,140 - INFO - Flask server started successfully
+2024-12-17 17:23:52,140 - INFO - Found 0 already completed fonts
+2024-12-17 17:23:52,140 - INFO - Will process 4 fonts starting with: ABeeZee
+2024-12-17 17:23:52,140 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-17 17:24:52,335 - WARNING - WebDriver connection failed (attempt 1/3). Retrying...
+2024-12-17 17:25:02,387 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-17 17:25:02,387 - INFO - Text stats: 372002 chars, approximately 14880 lines
+2024-12-17 17:25:02,387 - INFO - Starting dataset generation for 4 fonts
+2024-12-17 17:25:02,390 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-17 17:25:02,390 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-17 17:25:02,391 - INFO - 127.0.0.1 - - [17/Dec/2024 17:25:02] "GET /health HTTP/1.1" 200 -
+2024-12-17 17:25:02,392 - INFO - Flask server started successfully
+2024-12-17 17:25:02,393 - INFO - Found 0 already completed fonts
+2024-12-17 17:25:02,393 - INFO - Will process 4 fonts starting with: ABeeZee
+2024-12-17 17:25:02,393 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-17 17:26:02,584 - WARNING - WebDriver connection failed (attempt 1/3). Retrying...
+2024-12-17 17:27:04,775 - WARNING - WebDriver connection failed (attempt 2/3). Retrying...
+2024-12-17 17:27:45,298 - INFO - Loaded 4 fonts from fonts.txt
+2024-12-17 17:27:45,298 - INFO - Text stats: 372002 chars, approximately 14880 lines
+2024-12-17 17:27:45,298 - INFO - Starting dataset generation for 4 fonts
+2024-12-17 17:27:45,301 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-12-17 17:27:45,301 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-17 17:27:45,302 - INFO - 127.0.0.1 - - [17/Dec/2024 17:27:45] "GET /health HTTP/1.1" 200 -
+2024-12-17 17:27:45,303 - INFO - Flask server started successfully
+2024-12-17 17:27:45,303 - INFO - Found 0 already completed fonts
+2024-12-17 17:27:45,303 - INFO - Will process 4 fonts starting with: ABeeZee
+2024-12-17 17:27:45,303 - INFO - Processing font 1/4: ABeeZee (overall 1/4)
+2024-12-17 17:28:45,478 - WARNING - WebDriver connection failed (attempt 1/3). Retrying...
+2024-12-17 17:28:47,696 - WARNING - WebDriver connection failed (attempt 2/3). Retrying...
+2024-12-17 17:29:49,925 - ERROR - Failed to process font ABeeZee: Failed to establish WebDriver connection
+2024-12-17 17:29:49,926 - INFO - Processing font 2/4: Abel (overall 2/4)
+2024-12-17 17:30:29,291 - INFO - Received shutdown signal. Completing current font before exiting...
+2024-12-17 17:30:29,294 - ERROR - Failed to process font Abel: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2024-12-17 17:30:29,295 - INFO - Received shutdown signal, stopping gracefully...

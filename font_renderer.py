@@ -216,7 +216,7 @@ class FontRenderer:
 
 def main():
     renderer = FontRenderer(
-        fonts_file='full_fonts.txt',
+        fonts_file='full_fonts_list.txt',
         text_file='lorem_ipsum.txt',
         output_dir='font-images2',
         template_dir='templates',
