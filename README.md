@@ -81,3 +81,22 @@ challenge - 50GB of image data is too big to upload past Github 5GB limit
 
 TODO experiment with different image sizes and compression levels
 TODO try saving images in greyscale
+
+## Image parameters vs filesize 
+|Filesize  | Compression    | Resolution     | Container | Quality   |
+| -------  | -------------- | -------------- | --------- | -------   |
+~1 kb      | compression 10 | image size 128 |    128    |too zoomed |
+2-3kb      | compression 10 | image size 256 |    128    |too zoomed |
+4-5kb      | compression 10 | image size 256 |    256    |           |
+7-8kb      | compression 20 | image size 256 |    256    |           |
+12-13kb    | compression 10 | image size 512 |    256    |           |
+15-16kb    | compression 20 | image size 512 |    256    |           |
+4-5kb      | compression 10 | image size 256 |    512    | terrible  |
+__         | compression 20 | image size 256 |    512    |           |
+18-20kb    | compression 10 | image size 512 |    512    | too wide  |
+__         | compression 20 | image size 512 |    512    |  |
+
+
+ideally we want to add the downstream ML objective to this table since that is the actual tradeoff we care about 
+
+what if we increase the font size instead of increasing the resolution / amount of text in each image
