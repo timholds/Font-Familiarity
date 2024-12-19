@@ -105,3 +105,5 @@ TODO try saving images in greyscale
 ideally we want to add the downstream ML objective to this table since that is the actual tradeoff we care about 
 
 what if we increase the font size instead of increasing the resolution / amount of text in each image
+
+some blurring can actually be desirable for the ML task as it has a regularizing effect. in other words, blurring helps bias the parameters of the network to be closer to 0, which will lead to smoother loss landscapes and better generalization. in other words, small weights and biases mean less expressability but smoother interpolation between training points. this all reduces overfitting. 
