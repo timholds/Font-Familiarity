@@ -5,6 +5,8 @@ import pickle
 from pathlib import Path
 from tqdm import tqdm
 
+# Running main of this file converts 
+
 def create_label_mapping(root_dir):
     """Create a mapping of font names to integer labels"""
     font_dirs = [d for d in os.listdir(root_dir) 
@@ -89,7 +91,7 @@ def save_batch(images, labels, filename):
         pickle.dump(data, f)
 
 if __name__ == "__main__":
-    root_dir = "font-images"
+    root_dir = "font-images2"
     output_file = "font_dataset"
     
     label_mapping = process_dataset(root_dir, output_file)

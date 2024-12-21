@@ -17,6 +17,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
+import argparse
+
+# Running main of this file will take the list of fonts passed in 
+# and turn it into 
 
 # Configure logging
 logging.basicConfig(
@@ -215,12 +219,18 @@ class FontRenderer:
         logger.info("Dataset generation complete")
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--text_file', default='lorem_ipsum.txt')
+    parser.add_argument('--font_file', default='fonts.txt')
+    parser.add_argument('--image_resolution', default=256)
+    args = parser.parse_args()
+
     renderer = FontRenderer(
-        fonts_file='fonts.txt',
-        text_file='lorem_ipsum.txt',
+        fonts_file=args.font_file,
+        text_file=args.text_file,
         output_dir='font-images3',
         template_dir='templates',
-        image_size=(256, 256),  # Smaller size
+        image_size=(args.image_resolution, args.image_resolution),  # Smaller size
         #image_size=(128, 128),  # Smaller size
         image_quality=10
     )
