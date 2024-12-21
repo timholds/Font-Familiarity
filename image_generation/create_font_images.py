@@ -19,8 +19,10 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 import argparse
 
-# Running main of this file will take the list of fonts passed in 
-# and turn it into 
+# Running main takes the list of fonts passed in and 
+# renders the text file passed in each font
+# it will generate screenshots of the text to save
+# for a machine learning task
 
 # Configure logging
 logging.basicConfig(

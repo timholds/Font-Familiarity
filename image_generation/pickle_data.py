@@ -92,7 +92,7 @@ def save_batch(images, labels, filename):
 
 if __name__ == "__main__":
     root_dir = "font-images2"
-    output_file = "font_dataset"
+    output_file = "fonts-pckl"
     
     label_mapping = process_dataset(root_dir, output_file)
     print("Dataset processing complete!")
