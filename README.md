@@ -107,3 +107,27 @@ ideally we want to add the downstream ML objective to this table since that is t
 what if we increase the font size instead of increasing the resolution / amount of text in each image
 
 some blurring can actually be desirable for the ML task as it has a regularizing effect. in other words, blurring helps bias the parameters of the network to be closer to 0, which will lead to smoother loss landscapes and better generalization. in other words, small weights and biases mean less expressability but smoother interpolation between training points. this all reduces overfitting. 
+
+
+TODO make it so people can upload images of paid fonts to find most similar free fonts.
+- normalize the image to the same size
+- ask people to type on a blank page with a certain font size to normalize?
+- allow people to 
+
+allow people to pay to get their font included - upload your font file and we generate the lorum ipsum
+
+# TODO
+how do i want to handle the labels?
+- want to create image / label pairs 
+do we want to split the data into train/test beforehand and store them in separate folders?
+- maybe just copy the cifar10 structure 
+- unpickle the objects and load into a dictionary with d{data: np.array(), labels}
+
+in train.py, we want to function to generate_batches():
+- download the dataset tar to the machine from huggingface if it's not on there
+
+Pickling process:
+-Read through your directory structure
+-Create a label mapping (font name → integer)
+-Load images and convert them to arrays
+-Save everything in pickle format

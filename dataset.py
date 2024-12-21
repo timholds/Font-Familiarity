@@ -27,7 +27,7 @@ class FontDataset:
         text_idx = idx % len(self.text_samples)
         
         return self.font_names[font_idx], self.text_samples[text_idx], font_idx
-    
+
 
 
 
