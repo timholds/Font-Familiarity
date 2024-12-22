@@ -2,98 +2,85 @@ import os
 import numpy as np
 from PIL import Image
 import pickle
-from pathlib import Path
 from tqdm import tqdm
 
-# Running main of this file converts 
+def debug_batch_size(images, labels):
+    """Print debug info about batch before saving"""
+    data_array = np.array(images)
+    labels_array = np.array(labels)
+    
+    print(f"\nDebug batch info:")
+    print(f"Number of images: {len(images)}")
+    print(f"Data array shape: {data_array.shape}")
+    print(f"Data array dtype: {data_array.dtype}")
+    print(f"Labels shape: {labels_array.shape}")
+    print(f"Memory usage of data array: {data_array.nbytes / (1024**3):.2f} GB")
+    
+    # Check first few images
+    print("\nFirst few image shapes:")
+    for i in range(min(3, len(images))):
+        print(f"Image {i} shape: {images[i].shape}")
 
-def create_label_mapping(root_dir):
-    """Create a mapping of font names to integer labels"""
-    font_dirs = [d for d in os.listdir(root_dir) 
-                if os.path.isdir(os.path.join(root_dir, d))]
-    return {font: idx for idx, font in enumerate(sorted(font_dirs))}
+def save_batch_with_debug(images, labels, filename):
+    """Save a batch of images and labels with debugging info"""
+    debug_batch_size(images, labels)
+    
+    data = {
+        'data': np.array(images),
+        'labels': np.array(labels)
+    }
+    
+    # Get size before saving
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f, protocol=4)
+    
+    # Print file size after saving
+    file_size = os.path.getsize(filename) / (1024**3)  # Convert to GB
+    print(f"Saved file size: {file_size:.2f} GB")
 
-def process_dataset(root_dir, output_file, batch_size=10000):
-    """Process the dataset and save as pickle file"""
+# Test with just first batch
+def test_processing(root_dir, output_dir, max_images=70000):
+    os.makedirs(output_dir, exist_ok=True)
     
-    # Create label mapping
-    label_mapping = create_label_mapping(root_dir)
-    print(f"Found {len(label_mapping)} font classes")
-    
-    # Count total files for progress bar
-    total_files = sum(len(files) for _, _, files in os.walk(root_dir))
-    
-    # Storage for current batch
     current_batch = []
     current_labels = []
-    batch_count = 1
+    processed = 0
     
-    with tqdm(total=total_files, desc="Processing images") as pbar:
-        # Iterate through font directories
-        for font_name in sorted(os.listdir(root_dir)):
-            font_dir = os.path.join(root_dir, font_name)
-            if not os.path.isdir(font_dir):
+    # Process just enough images for one batch
+    for font_name in sorted(os.listdir(root_dir)):
+        if processed >= max_images:
+            break
+            
+        font_dir = os.path.join(root_dir, font_name)
+        if not os.path.isdir(font_dir):
+            continue
+        
+        for img_file in sorted(os.listdir(font_dir)):
+            if processed >= max_images:
+                break
+                
+            if not img_file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 continue
             
-            label = label_mapping[font_name]
+            img_path = os.path.join(font_dir, img_file)
             
-            # Process all images in font directory
-            for img_file in sorted(os.listdir(font_dir)):
-                if not img_file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    continue
-                
-                img_path = os.path.join(font_dir, img_file)
-                
-                try:
-                    # Load image as numpy array
-                    with Image.open(img_path) as img:
-                        if img.mode != 'RGB':
-                            img = img.convert('RGB')
-                        img_array = np.array(img)
-                        
-                        # Convert to PyTorch's expected format (C, H, W)
-                        img_array = img_array.transpose(2, 0, 1)
-                        
-                        current_batch.append(img_array)
-                        current_labels.append(label)
-                        
-                        # Save batch if it reaches the batch size
-                        if len(current_batch) >= batch_size:
-                            save_batch(current_batch, current_labels, 
-                                     f"{output_file}_{batch_count}.pkl")
-                            current_batch = []
-                            current_labels = []
-                            batch_count += 1
-                
-                except Exception as e:
-                    print(f"Error processing {img_path}: {e}")
-                
-                pbar.update(1)
+            try:
+                with Image.open(img_path) as img:
+                    img_array = np.array(img)
+                    current_batch.append(img_array)
+                    current_labels.append(0)  # Dummy label for testing
+                    processed += 1
+            except Exception as e:
+                print(f"Error processing {img_path}: {e}")
     
-    # Save any remaining images in the final batch
+    # Save test batch
     if current_batch:
-        save_batch(current_batch, current_labels, 
-                  f"{output_file}_{batch_count}.pkl")
-    
-    # Save label mapping
-    with open(f"{output_file}_mapping.pkl", 'wb') as f:
-        pickle.dump(label_mapping, f)
-    
-    return label_mapping
-
-def save_batch(images, labels, filename):
-    """Save a batch of images and labels"""
-    data = {
-        'data': np.array(images),    # Shape: (N, C, H, W)
-        'labels': np.array(labels)   # Shape: (N,)
-    }
-    with open(filename, 'wb') as f:
-        pickle.dump(data, f)
+        save_batch_with_debug(current_batch, current_labels,
+                            os.path.join(output_dir, 'test_batch.pkl'))
 
 if __name__ == "__main__":
-    root_dir = "font-images2"
-    output_file = "fonts-pckl"
+    root_dir = "font-images2"  # Updated directory name
+    output_dir = "font_dataset_test"
     
-    label_mapping = process_dataset(root_dir, output_file)
-    print("Dataset processing complete!")
-    print(f"Label mapping saved to {output_file}_mapping.pkl")
+    print("Running test processing...")
+    test_processing(root_dir, output_dir, max_images=70000)
