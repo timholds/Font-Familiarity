@@ -11,3 +11,4 @@ font-images*.zip
 *.pkl
 *.pkl.gz
 *.npz
+*.npy
