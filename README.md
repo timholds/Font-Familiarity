@@ -125,9 +125,33 @@ do we want to split the data into train/test beforehand and store them in separa
 
 in train.py, we want to function to generate_batches():
 - download the dataset tar to the machine from huggingface if it's not on there
-
+ 
 Pickling process:
 -Read through your directory structure
 -Create a label mapping (font name → integer)
 -Load images and convert them to arrays
 -Save everything in pickle format
+
+Pickling challenges
+-was reading in the data as 3 channel by default when I really have black and white images
+-the images are already compressed when they got saved to the dataset. Reading them in with numpy uncompresses them and I failed to recompress the first couple attempts
+    - two options: numpy built in compression or more aggressive compression with gzip and pickle 
+
+
+# Compression
+How are we handling compression?
+What does image compression actually mean? Explain why it would be nonsensical to 
+
+**On disk** We want the images compressed on disk so they don't take up too much space. If we were using cloud storage like AWS S3, having the images compressed will save money, since they charge based on the size of outgoing data rather than the number of transfer events.
+
+**At train time**, we want the data uncompressed on the GPU so that we have arrays 
+
+What kind of color space do we need for the training images?
+
+
+Imagine the space of image augmentations that would be helpful if we wanted to let people upload arbitrary photos of fonts?
+- font size
+- bold / italicized
+- font color, background color
+- background texture
+- text placement / centering

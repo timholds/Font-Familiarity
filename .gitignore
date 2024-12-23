@@ -9,3 +9,5 @@ font-images 2.zip
 font-images*/
 font-images*.zip
 *.pkl
+*.pkl.gz
+*.npz

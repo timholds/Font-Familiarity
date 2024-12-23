@@ -149,7 +149,7 @@ class FontRenderer:
             else:
                 raise ValueError(f"Unsupported format: {format}")
             
-    def _capture_font_screenshots(self, font: str, num_samples: int = 1000) -> None:
+    def _capture_font_screenshots(self, font: str, num_samples: int = 10) -> None:
         """Capture screenshots for a single font with scrolling"""
         driver = None
         try:
@@ -224,7 +224,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--text_file', default='lorem_ipsum.txt')
     parser.add_argument('--font_file', default='fonts.txt')
-    parser.add_argument('--image_resolution', default=256)
+    parser.add_argument('--image_resolution', default=128)
     args = parser.parse_args()
 
     renderer = FontRenderer(
