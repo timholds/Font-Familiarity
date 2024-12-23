@@ -1,69 +1,64 @@
-from typing import List, Tuple
+import os
+import numpy as np
+import torch
+from torch.utils.data import Dataset, DataLoader
+from typing import Tuple
 
-class FontDataset:
-    def __init__(self, text_samples: List[str], fonts_file='fonts.txt'):
-        self.fonts = self.load_fonts(fonts_file)
-        self.text_samples = text_samples
+class FontDataset(Dataset):
+    """
+    Dataset for loading font images from NPZ files.
+    """
+    def __init__(self, root_dir: str, train: bool = True):
+        self.root_dir = root_dir
+        mode = 'train' if train else 'test'
+        data_file = os.path.join(root_dir, f'{mode}.npz')
+        
+        # Load data from NPZ file
+        with np.load(data_file) as data:
+            print("Keys in NPZ file:", data.files)
+            self.data = data['images']     # Shape: (N, 256, 256)
+            self.targets = data['labels']   # Shape: (N,)
+        
+        # Load label mapping
+        label_map_path = os.path.join(root_dir, 'label_mapping.npy')
+        self.label_mapping = np.load(label_map_path, allow_pickle=True).item()
+        self.num_classes = len(self.label_mapping)
 
-    def load_fonts(self, fonts_file):
-        with open(fonts_file, 'r') as file:
-            fonts = [line.strip() for line in file.readlines()]
-        return fonts
+    def __len__(self) -> int:
+        return len(self.data)
 
-    def get_fonts(self):
-        return self.fonts
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
+        img = self.data[idx].astype(np.float32) / 255.0  # Normalize to [0, 1]
+        img = torch.from_numpy(img).unsqueeze(0)  # Add channel dimension
+        target = self.targets[idx]
+        
+        return img, target
+
+def get_dataloaders(
+    data_dir: str,
+    batch_size: int = 32,
+    num_workers: int = 4
+) -> Tuple[DataLoader, DataLoader]:
+    """
+    Creates train and test DataLoaders.
+    """
+    train_dataset = FontDataset(data_dir, train=True)
+    test_dataset = FontDataset(data_dir, train=False)
     
-    def __len__(self):
-        return len(self.fonts)
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True
+    )
     
-    def __getitem__(self, idx) -> Tuple[str, str, int]:
-        """
-        Returns:
-            font_name: Name of the font
-            text: Text sample to render
-            font_idx: Index of the font in the dataset
-        """
-        font_idx = idx // len(self.text_samples)
-        text_idx = idx % len(self.text_samples)
-        
-        return self.font_names[font_idx], self.text_samples[text_idx], font_idx
-
-
-
-
-
-# class FontDataset(Dataset):
-#     def __init__(self, font_paths: List[str], text_samples: List[str]):
-#         self.font_paths = font_paths
-#         self.text_samples = text_samples
-#         self.transforms = transforms.Compose([
-#             transforms.Resize((64, 512)),
-#             transforms.ToTensor(),
-#         ])
-        
-#         # Create font_to_idx mapping
-#         self.font_to_idx = {path: idx for idx, path in enumerate(font_paths)}
-        
-#     def __len__(self):
-#         return len(self.font_paths) * len(self.text_samples)
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True
+    )
     
-    # def __getitem__(self, idx):
-    #     font_idx = idx // len(self.text_samples)
-    #     text_idx = idx % len(self.text_samples)
-        
-    #     font_path = self.font_paths[font_idx]
-    #     text = self.text_samples[text_idx]
-        
-    #     # Create image with rendered text
-    #     img = Image.new('L', (512, 64), color='white')
-    #     try:
-    #         font = ImageFont.truetype(font_path, 48)
-    #         draw = ImageDraw.Draw(img)
-    #         draw.text((10, 10), text, font=font, fill='black')
-    #     except Exception as e:
-    #         print(f"Error loading font {font_path}: {e}")
-    #         # Return a blank image if font loading fails
-    #         pass
-        
-    #     return self.transforms(img), font_idx
-    
+    return train_loader, test_loader, train_dataset.num_classes
