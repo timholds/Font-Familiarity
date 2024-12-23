@@ -155,3 +155,13 @@ Imagine the space of image augmentations that would be helpful if we wanted to l
 - font color, background color
 - background texture
 - text placement / centering
+
+.npz is for saving multiple numpy arrays, .npy is for saving single arrays
+
+.npz is a good choice here since it's more memory-efficient than .pkl for large arrays, and since the dataset is significantly larger than CIFAR.
+
+# TODO 
+what is the best way to store this dataset if I wanted to make it uber scalable? Store it on AWS S3 as compressed
+
+Add code to download it from a public bucket
+
