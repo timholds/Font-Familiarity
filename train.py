@@ -7,6 +7,10 @@ from dataset import get_dataloaders
 from model import SimpleCNN
 import argparse
 import wandb
+from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR
+from torch.optim import AdamW  # Consider using AdamW instead of Adam
+
+
 
 def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_classes: int):
     """Calculate per-class and overall metrics using PyTorch."""
@@ -139,29 +143,47 @@ def compute_class_embeddings(model, dataloader, num_classes, device):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default="font_dataset_npz/")
-    parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--learning_rate", type=float, default=0.001)
+    parser.add_argument("--learning_rate", type=float, default=0.0003)
+    parser.add_argument("--weight_decay", type=float, default=0.01)
     args = parser.parse_args()
 
     wandb.init(
         project="Font-Familiarity",
-        name=f"experiment_{time.strftime('%Y%m%d_%H%M%S')}",  # Gives each run a unique name
+        name=f"experiment_{time.strftime('%Y-%m-%d_%H-%M-%S')}",  # Gives each run a unique name
         config={
             "architecture": "CNN",  # or whatever you're using
             "learning_rate": args.learning_rate,
             "batch_size": args.batch_size,
             "epochs": args.epochs,
+            "weight_decay": args.weight_decay,
+            "warmup_epochs": warmup_epochs,
+            "optimizer": "AdamW"
             # Add any other hyperparameters
             }
         )
     # Training settings
     data_dir = args.data_dir
     batch_size = args.batch_size
+    warmup_epochs = max(args.epochs // 5, 1)  # At least 1 epoch of warmup
     epochs = args.epochs
     learning_rate = args.learning_rate
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
+    # Create warmup scheduler
+    warmup_scheduler = LinearLR(
+        optimizer,
+        start_factor=0.1,  # Start at 10% of base lr
+        total_iters=warmup_epochs * len(train_loader)
+    )
+
+    # Create main scheduler
+    main_scheduler = CosineAnnealingLR(
+        optimizer,
+        T_max=(epochs - warmup_epochs) * len(train_loader),
+        eta_min=1e-6  # Minimum learning rate
+    )
     # Load data
     print("Loading data...")
     train_loader, test_loader, num_classes = get_dataloaders(
@@ -174,7 +196,25 @@ def main():
     model = SimpleCNN(num_classes=num_classes).to(device)
     wandb.watch(model, log_freq=100)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(
+        model.parameters(),
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay
+    )
+
+    # Schedulers
+    warmup_scheduler = LinearLR(
+        optimizer,
+        start_factor=0.1,
+        total_iters=warmup_epochs * len(train_loader)
+    )
+
+    main_scheduler = CosineAnnealingLR(
+        optimizer,
+        T_max=(args.epochs - warmup_epochs) * len(train_loader),
+        eta_min=1e-6
+    )
     
     # Training loop
     print("Starting training...")
@@ -188,6 +228,12 @@ def main():
         train_loss, train_acc = train_epoch(
             model, train_loader, criterion, optimizer, device
         )
+
+        # Step the appropriate scheduler
+        if epoch < warmup_epochs:
+            warmup_scheduler.step()
+        else:
+            main_scheduler.step()
         
         # Evaluate
         test_loss, test_acc, metrics_report, per_class_acc = evaluate(
@@ -207,10 +253,18 @@ def main():
             "learning_rate": optimizer.param_groups[0]['lr']
         }
         
-        # Add per-class accuracies
-        for cls in range(num_classes):
-            metrics_dict[f"class_{cls}_accuracy"] = per_class_acc[cls].item() * 100
-            
+        class_accs = per_class_acc * 100  # Convert to percentages
+        metrics_dict.update({
+            "class_acc_min": class_accs.min().item(),
+            "class_acc_max": class_accs.max().item(),
+            "class_acc_mean": class_accs.mean().item(),
+            "class_acc_median": class_accs.median().item(),
+            "class_acc_std": class_accs.std().item(),
+            # Add percentiles for more detailed distribution info
+            "class_acc_25th": torch.quantile(class_accs, 0.25).item(),
+            "class_acc_75th": torch.quantile(class_accs, 0.75).item(),
+        })
+    
         wandb.log(metrics_dict)
         
         # Print epoch summary
