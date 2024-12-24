@@ -12,30 +12,49 @@ class SimpleCNN(nn.Module):
     Input: (batch_size, 1, 256, 256)
     """
     def __init__(self, num_classes: int, 
-                #  in_channels: int = 1,
-                input_size: int = 64,
-                #  channel_sizes: list = [8, 16, 32, 64],
-                #  embedding_dim: int = 1024
-                ):
+                 in_channels: int = 1,
+                 input_size: int = 64,
+                 embedding_dim: int = 1024,
+                 initial_channels: int = 16):
+
         super().__init__() 
         self.input_size = input_size   
         self.transform = transforms.Resize((self.input_size, self.input_size))
 
-        self.features = nn.Sequential(
-            nn.Conv2d(1, 16, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-            nn.Conv2d(16, 32, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2)
-        )
+        # Build feature layers with single conv per block
+        layers = []
+        curr_channels = in_channels
+        next_channels = initial_channels
+        for _ in range(4):  # 4 downsample blocks
+            layers.extend([
+                nn.Conv2d(curr_channels, next_channels, kernel_size=3, padding=1),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(2)
+            ])
+            curr_channels = next_channels
+            next_channels *= 2  # Double channels after each block
+            
+        self.features = nn.Sequential(*layers)
         self.flatten = nn.Flatten()
+
+
+        # self.features = nn.Sequential(
+        #     nn.Conv2d(1, 16, kernel_size=3, padding=1),
+        #     nn.ReLU(inplace=True),
+        #     nn.MaxPool2d(2),
+        #     nn.Conv2d(16, 32, kernel_size=3, padding=1),
+        #     nn.ReLU(inplace=True),
+        #     nn.MaxPool2d(2),
+        #     nn.Conv2d(32, 64, kernel_size=3, padding=1),
+        #     nn.ReLU(inplace=True),
+        #     nn.MaxPool2d(2),
+        #     nn.Conv2d(64, 128, kernel_size=3, padding=1),
+        #     nn.ReLU(inplace=True),
+        #     nn.MaxPool2d(2)
+        # )
+        # self.flatten = nn.Flatten()
+
+
         # self.features = nn.Sequential(
         #     nn.Conv2d(1, 16, kernel_size=3, padding=1),
         #     nn.ReLU(inplace=True),
@@ -60,22 +79,7 @@ class SimpleCNN(nn.Module):
         # )
         # self.flatten = nn.Flatten()
 
-        # # Build feature layers dynamically
-        # layers = []
-        # curr_channels = in_channels
-        # for channels in channel_sizes:
-        #     layers.extend([
-        #         nn.Conv2d(curr_channels, channels, kernel_size=3, padding=1),
-        #         nn.ReLU(inplace=True),
-        #         nn.Conv2d(channels, channels, kernel_size=3, padding=1),
-        #         nn.ReLU(inplace=True),
-        #         nn.MaxPool2d(2)
-        #     ])
-        #     curr_channels = channels
-            
-        # self.features = nn.Sequential(*layers)
-        # self.flatten = nn.Flatten()
-
+       
         # Calculate flattened dim dynamically
         with torch.no_grad():
             dummy_input = torch.zeros(1, 1, self.input_size, self.input_size)
@@ -93,13 +97,13 @@ class SimpleCNN(nn.Module):
         #self.flatten_dim = 128 * 4 * 4 
 
         self.embedding_layer = nn.Sequential(
-            nn.Linear(self.flatten_dim, 1024),
+            nn.Linear(self.flatten_dim, embedding_dim),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5)
         )
     
         
-        self.classifier = nn.Linear(1024, num_classes)
+        self.classifier = nn.Linear(embedding_dim, num_classes)
 
 
 

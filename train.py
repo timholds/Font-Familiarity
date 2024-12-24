@@ -142,68 +142,70 @@ def compute_class_embeddings(model, dataloader, num_classes, device):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="font_dataset_npz_test/")
+    parser.add_argument("--data_dir", default="font_dataset_npz/")
     parser.add_argument("--epochs", type=int, default=30)
-    parser.add_argument("--resolution", type=int, default=64)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--learning_rate", type=float, default=0.003)
     parser.add_argument("--weight_decay", type=float, default=0.01)
-    args = parser.parse_args()
+    parser.add_argument("--embedding_dim", type=int, default=1024)
+    parser.add_argument("--resolution", type=int, default=64)
+    parser.add_argument("--initial_channels", type=int, default=16)
 
-    warmup_epochs = max(args.epochs // 5, 1)  # At least 1 epoch of warmup
+    args = parser.parse_args()
+    
+    # Calculate warmup_epochs before wandb init since we need it in the config
+    warmup_epochs = max(args.epochs // 5, 1)
+
+    # Initialize wandb and get config right after parsing args
+    wandb.init(
+        project="Font-Familiarity",
+        config={
+            **vars(args),
+            "architecture": "CNN",
+            "warmup_epochs": warmup_epochs,
+            "optimizer": "AdamW"
+        }
+    )
+    config = wandb.config
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Load data
+    # Now use config instead of args for values that might be swept
     print("Loading data...")
     train_loader, test_loader, num_classes = get_dataloaders(
-        data_dir=args.data_dir,
-        batch_size=args.batch_size
+        data_dir=args.data_dir,  # not swept
+        batch_size=config.batch_size  # swept
     )
 
-   
-    # Initialize model, criterion, and optimizer
     print(f"Initializing model (num_classes={num_classes})...")
-    model = SimpleCNN(num_classes=num_classes, 
-                      input_size=args.resolution
-                      ).to(device)
+    model = SimpleCNN(
+        num_classes=num_classes,
+        embedding_dim=config.embedding_dim,
+        input_size=config.resolution,
+        initial_channels=config.initial_channels
+    ).to(device)
+
+    # Watch model right after it's created
+    wandb.watch(model, log_freq=100)
+
     criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = AdamW(
         model.parameters(),
-        lr=args.learning_rate,
-        weight_decay=args.weight_decay
+        lr=config.learning_rate,
+        weight_decay=config.weight_decay
     )
    
-    # Create warmup scheduler
     warmup_scheduler = LinearLR(
         optimizer,
-        start_factor=0.1,  # Start at 10% of base lr
+        start_factor=0.1,
         total_iters=warmup_epochs * len(train_loader)
     )
 
-    # Create main scheduler
     main_scheduler = CosineAnnealingLR(
         optimizer,
-        T_max=(args.epochs - warmup_epochs) * len(train_loader),
-        eta_min=1e-6  # Minimum learning rate
+        T_max=(config.epochs - warmup_epochs) * len(train_loader),
+        eta_min=1e-6
     )
-
-    wandb.init(
-        project="Font-Familiarity",
-        name=f"experiment_{time.strftime('%Y-%m-%d_%H-%M-%S')}",  # Gives each run a unique name
-        config={
-            "architecture": "CNN",  # or whatever you're using
-            "learning_rate": args.learning_rate,
-            "batch_size": args.batch_size,
-            "epochs": args.epochs,
-            "weight_decay": args.weight_decay,
-            "warmup_epochs": warmup_epochs,
-            "optimizer": "AdamW"
-            # Add any other hyperparameters
-            }
-        )
-    wandb.watch(model, log_freq=100)
-
    
     # Training loop
     print("Starting training...")
