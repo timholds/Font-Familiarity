@@ -12,4 +12,4 @@ font-images*.zip
 *.pkl.gz
 *.npz
 *.npy
-.pt
+*.pt

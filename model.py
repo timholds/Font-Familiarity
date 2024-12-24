@@ -53,11 +53,16 @@ class SimpleCNN(nn.Module):
             nn.Linear(1024, num_classes)
         )
 
-    def forward(self, x):
-        x = self.transform(x)  # Resize the input
+    def get_embedding(self, x):
+        x = self.transform(x)
         x = self.features(x)
         x = self.flatten(x)
-        x = self.classifier(x)
+        embeddings = self.embedding(x)
+        return embeddings
+
+    def forward(self, x):
+        embeddings = self.get_embedding(x)
+        x = self.classifier(embeddings)
         return x
     
 # class FontEncoder(nn.Module):
