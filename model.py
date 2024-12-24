@@ -29,35 +29,31 @@ class SimpleCNN(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2)
         )
-
-        # Adjust the input size of the first linear layer
-        # After resizing to 64x64 and going through the CNN layers:
-        # 64x64 -> 32x32 (first maxpool) -> 16x16 (second maxpool) -> 
-        # 8x8 (third maxpool) -> 4x4 (fourth maxpool)
-        # So final feature map size is 256 * 4 * 4
+        self.flatten = nn.Flatten()
 
         # Calculate dimensions by hand:
         # resolution /(2^num_downsamples)
-        # Input 64x64 -> 32x32 -> 16x16 -> 8x8 -> 4x4
+        # After resizing to 64x64 and going through the CNN layers:
+        # Ex: input 64x64 -> 32x32 -> 16x16 -> 8x8 -> 4x4
         # Final channels = 256
-        # Therefore: 256 * 4 * 4 = 4096   
-        self.flatten = nn.Flatten()
-        self.flatten_dim = 4096  
-        self.classifier = nn.Linear(self.flatten_dim, num_classes)
-
-
-        self.classifier = nn.Sequential(
-            nn.Linear(256 * 4 * 4, 1024),
+        # Final feature map 256 * 4 * 4 = 4096 
+        self.flatten_dim = 256 * 4 * 4 
+        self.embedding_layer = nn.Sequential(
+            nn.Linear(self.flatten_dim, 1024),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-            nn.Linear(1024, num_classes)
+            nn.Dropout(0.5)
         )
+    
+        
+        self.classifier = nn.Linear(1024, num_classes)
+
+
 
     def get_embedding(self, x):
         x = self.transform(x)
         x = self.features(x)
         x = self.flatten(x)
-        embeddings = self.embedding(x)
+        embeddings = self.embedding_layer(x)
         return embeddings
 
     def forward(self, x):

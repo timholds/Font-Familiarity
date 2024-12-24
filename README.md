@@ -44,6 +44,7 @@ no access to training data, "synthesizes pseudo samples from the underlying data
 distribution on which it is trained."
 
 do contrastive losses mean anything for us? could we classify the fonts into families and use that as an (additional) label?
+-"Metric learning: focuses on learning distance metrics between data points"
 
 [ ] figure out how to get the images into a nice shape for ML
 - what resolution should i use 
@@ -168,4 +169,27 @@ Add code to download it from a public bucket
 Try contrastive loss
 
 Figure out how to keep track of the model experiments 
+
+Test my model on cifar dataset instead to sanity check that it is capable of learning anything
+
+Add a note about how the data is stored in the npz and the best way to access it
+- remove "Keys in NPZ file: ['images', 'labels']"
+
+# Inference
+Our goal is to find which fonts are most similar to the unknown input font, so we need to have some idea of what all the *known* fonts look like in feature space and return the closest ones. 
+
+To find that, we can take the trained model and for each class, average the output embedding over all the training examples to give us a prototype average for each class. 
+
+For each font class (out of the ~700 fonts), we're:
+- Taking all images of that font (1000 images per class in this case)
+- Running each through the model to get its 1024-dimensional feature vector
+- Computing the average of all these vectors for that class
+
+So if Font_A with n images, we get one 1024-dim vector representing the "average characteristics" of Font_A
+
+
+-TODO some explaining about high dimensional representations where all the datapoints are super far from each other so being close in one dimension ends up being close in 
+-TODO does it matter whether you take the class average over the train set vs the validation or test set?
+
+Do I need to do any regularization?
 

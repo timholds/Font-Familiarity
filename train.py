@@ -89,16 +89,53 @@ def evaluate(model, test_loader, criterion, device, num_classes):
     
     return test_loss / len(test_loader), overall_acc * 100, metrics_report
 
+def compute_class_embeddings(model, dataloader, num_classes, device):
+    """Compute and store average embeddings for each class."""
+    print("\nComputing class embeddings...")
+    model.eval()
+    
+    # Initialize storage for embeddings and counts
+    class_embeddings = torch.zeros(num_classes, 1024).to(device)  # 1024 is embedding dim
+    class_counts = torch.zeros(num_classes).to(device)
+    
+    with torch.no_grad():
+        for data, target in tqdm(dataloader, desc='Computing embeddings'):
+            data, target = data.to(device), target.to(device)
+            
+            # Get embeddings (features before final classification layer)
+            embeddings = model.get_embedding(data)
+            
+            # Accumulate embeddings for each class
+            for i in range(len(target)):
+                class_idx = target[i].item()
+                class_embeddings[class_idx] += embeddings[i]
+                class_counts[class_idx] += 1
+    
+    # Compute averages
+    for i in range(num_classes):
+        if class_counts[i] > 0:
+            class_embeddings[i] /= class_counts[i]
+    
+    # Verify no classes were empty
+    empty_classes = (class_counts == 0).sum().item()
+    if empty_classes > 0:
+        print(f"Warning: {empty_classes} classes had no samples!")
+    
+    return class_embeddings
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default="font_dataset_npz/")
+    parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--learning_rate", type=float, default=0.001)
     args = parser.parse_args()
 
     # Training settings
-    data_dir = args.data_dir  # Update this path
-    batch_size = 128
-    epochs = 3
-    learning_rate = 0.001
+    data_dir = args.data_dir
+    batch_size = args.batch_size
+    epochs = args.epochs
+    learning_rate = args.learning_rate
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # Load data
@@ -116,6 +153,8 @@ def main():
     
     # Training loop
     print("Starting training...")
+    best_test_acc = 0.0
+    
     for epoch in range(epochs):
         print(f'\nEpoch: {epoch+1}/{epochs}')
         start_time = time.time()
@@ -139,14 +178,30 @@ def main():
         print(f'Test Loss: {test_loss:.3f} | Test Acc: {test_acc:.2f}%')
         print(metrics_report)
         
-        # Save checkpoint
-        torch.save({
-            'epoch': epoch + 1,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'train_loss': train_loss,
-            'test_loss': test_loss,
-        }, f'checkpoint_epoch_{epoch+1}.pt')
+        # Save if best model
+        if test_acc > best_test_acc:
+            best_test_acc = test_acc
+            print(f"New best model! (Test Acc: {test_acc:.2f}%)")
+            
+            # Compute class embeddings using training data
+            class_embeddings = compute_class_embeddings(
+                model, train_loader, num_classes, device
+            )
+            
+            # Save both model and embeddings
+            torch.save({
+                'epoch': epoch + 1,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'train_loss': train_loss,
+                'test_loss': test_loss,
+                'test_acc': test_acc,
+                'class_embeddings': class_embeddings,
+                'num_classes': num_classes
+            }, 'best_model.pt')
+
+    print("\nTraining completed!")
+    print(f"Best test accuracy: {best_test_acc:.2f}%")
 
 if __name__ == "__main__":
     main()
