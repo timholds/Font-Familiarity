@@ -95,7 +95,7 @@ def save_dataset(image_paths, labels, filename):
             print(f"Error processing {img_path}: {e}")
     
     np.savez_compressed(filename, 
-                       data=np.array(images),
+                       images=np.array(images),
                        labels=np.array(labels))
     
     file_size = os.path.getsize(filename) / (1024 ** 3)  # Size in GB
@@ -103,5 +103,5 @@ def save_dataset(image_paths, labels, filename):
 
 if __name__ == "__main__":
     root_dir = "font-images2"
-    output_dir = "font_dataset"
+    output_dir = "font_dataset_npz"
     process_dataset(root_dir, output_dir)

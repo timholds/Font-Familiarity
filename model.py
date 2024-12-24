@@ -3,6 +3,8 @@ from torch import nn
 
 import torch
 import torch.nn as nn
+import torchvision.transforms as transforms
+
 
 class SimpleCNN(nn.Module):
     """
@@ -11,6 +13,8 @@ class SimpleCNN(nn.Module):
     """
     def __init__(self, num_classes: int):
         super().__init__()
+        #self.transform = transforms.Resize((64, 64))
+
         self.features = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
@@ -34,6 +38,7 @@ class SimpleCNN(nn.Module):
         )
 
     def forward(self, x):
+        #x = self.transform(x)  # Resize the input
         x = self.features(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)

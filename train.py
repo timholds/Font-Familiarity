@@ -5,6 +5,7 @@ from tqdm import tqdm
 import time
 from dataset import get_dataloaders
 from model import SimpleCNN
+import argparse
 
 def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_classes: int):
     """Calculate per-class and overall metrics using PyTorch."""
@@ -89,9 +90,13 @@ def evaluate(model, test_loader, criterion, device, num_classes):
     return test_loss / len(test_loader), overall_acc * 100, metrics_report
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_dir", default="font_dataset_npz/")
+    args = parser.parse_args()
+
     # Training settings
-    data_dir = "font_dataset/"  # Update this path
-    batch_size = 32
+    data_dir = args.data_dir  # Update this path
+    batch_size = 128
     epochs = 3
     learning_rate = 0.001
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
