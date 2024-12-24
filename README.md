@@ -161,29 +161,34 @@ Imagine the space of image augmentations that would be helpful if we wanted to l
 
 .npz is a good choice here since it's more memory-efficient than .pkl for large arrays, and since the dataset is significantly larger than CIFAR.
 
+# Experiments
+[ ] Try contrastive loss
+[ ] Try triplet loss
+[ ] Experiment with weight decay
+[ ] Test single conv layers vs back to back conv layers between downsamples
+[ ] Add a wandb config file and sweep conv sizes
+
+
 # TODO 
 what is the best way to store this dataset if I wanted to make it uber scalable? Store it on AWS S3 as compressed
+-Add code to download dataset from a public bucket
 
-Add code to download it from a public bucket
-
-Try contrastive loss
-
-Figure out how to keep track of the model experiments 
+[X] Figure out how to keep track of the model experiments - use weights and biases 
 
 Test my model on cifar dataset instead to sanity check that it is capable of learning anything
 
-Add a note about how the data is stored in the npz and the best way to access it
+[ ] Add a note about how the data is stored in the npz and the best way to access it
 - remove "Keys in NPZ file: ['images', 'labels']"
 
-[ ] create a small test dataset for iterating on the model
-[ ] make it so that it only saves the class averages at the end of training instead of everytime a new best model gets saved
-[ ] add a LR warmup and cosine learning rate
-[ ] experiment with weight decay
+[X] create a small test dataset for iterating on the model - font_dataset_npz_test
+
+[X] make it so that it only saves the class averages at the end of training instead of everytime a new best model gets saved
+[X] add a LR warmup and cosine learning rate
 [ ] clean up hardcoded flatten_dim
         self.flatten_dim = 128 * 4 * 4 
         self.embedding_layer = nn.Sequential(
             nn.Linear(self.flatten_dim, 1024),
-[ ] experiment with triplet loss
+
 
 # Inference
 Our goal is to find which fonts are most similar to the unknown input font, so we need to have some idea of what all the *known* fonts look like in feature space and return the closest ones. 

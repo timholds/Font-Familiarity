@@ -142,8 +142,9 @@ def compute_class_embeddings(model, dataloader, num_classes, device):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="font_dataset_npz/")
+    parser.add_argument("--data_dir", default="font_dataset_npz_test/")
     parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--resolution", type=int, default=64)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--learning_rate", type=float, default=0.003)
     parser.add_argument("--weight_decay", type=float, default=0.01)
@@ -162,7 +163,9 @@ def main():
    
     # Initialize model, criterion, and optimizer
     print(f"Initializing model (num_classes={num_classes})...")
-    model = SimpleCNN(num_classes=num_classes).to(device)
+    model = SimpleCNN(num_classes=num_classes, 
+                      input_size=args.resolution
+                      ).to(device)
     criterion = nn.CrossEntropyLoss()
     # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = AdamW(

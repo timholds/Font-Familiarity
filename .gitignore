@@ -2,6 +2,8 @@ font-env/
 font-images/
 font-images2/
 font-images/
+font-images-test/
+font_dataset_test/
 compressed-images/
 font-images-compressed/
 font-images.zip
@@ -14,3 +16,6 @@ font-images*.zip
 *.npy
 *.pt
 *wandb*
+font_dataset_npz*/
+__pycache__/
+*.pyc
