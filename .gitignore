@@ -13,3 +13,4 @@ font-images*.zip
 *.npz
 *.npy
 *.pt
+*wandb*

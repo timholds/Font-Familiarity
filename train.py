@@ -6,6 +6,7 @@ import time
 from dataset import get_dataloaders
 from model import SimpleCNN
 import argparse
+import wandb
 
 def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_classes: int):
     """Calculate per-class and overall metrics using PyTorch."""
@@ -35,7 +36,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device):
     total = 0
     
     pbar = tqdm(train_loader, desc='Training')
-    for data, target in pbar:
+    for batch_idx, (data, target) in enumerate(pbar):
         data, target = data.to(device), target.to(device)
         
         optimizer.zero_grad()
@@ -47,7 +48,18 @@ def train_epoch(model, train_loader, criterion, optimizer, device):
         running_loss += loss.item()
         _, predicted = output.max(1)
         total += target.size(0)
-        correct += predicted.eq(target).sum().item()
+        batch_correct = predicted.eq(target).sum().item()
+        correct += batch_correct
+        
+        # Calculate batch accuracy
+        batch_acc = 100. * batch_correct / target.size(0)
+        
+        # Log batch-level metrics to wandb
+        wandb.log({
+            "batch_loss": loss.item(),
+            "batch_acc": batch_acc,
+            "batch": batch_idx
+        })
         
         # Update progress bar
         pbar.set_postfix({
@@ -131,6 +143,17 @@ def main():
     parser.add_argument("--learning_rate", type=float, default=0.001)
     args = parser.parse_args()
 
+    wandb.init(
+        project="Font-Familiarity",
+        name=f"experiment_{time.strftime('%Y%m%d_%H%M%S')}",  # Gives each run a unique name
+        config={
+            "architecture": "CNN",  # or whatever you're using
+            "learning_rate": args.learning_rate,
+            "batch_size": args.batch_size,
+            "epochs": args.epochs,
+            # Add any other hyperparameters
+            }
+        )
     # Training settings
     data_dir = args.data_dir
     batch_size = args.batch_size
@@ -148,6 +171,7 @@ def main():
     # Initialize model, criterion, and optimizer
     print(f"Initializing model (num_classes={num_classes})...")
     model = SimpleCNN(num_classes=num_classes).to(device)
+    wandb.watch(model, log_freq=100)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
@@ -170,6 +194,23 @@ def main():
         )
         
         epoch_time = time.time() - start_time
+        
+        # Log epoch-level metrics to wandb
+        wandb.log({
+            "epoch": epoch + 1,
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "test_loss": test_loss,
+            "test_acc": test_acc,
+            "epoch_time": epoch_time,
+            "learning_rate": optimizer.param_groups[0]['lr']
+        })
+
+        for cls in range(num_classes):
+            wandb.log({
+                f"class_{cls}_accuracy": per_class_acc[cls].item() * 100,
+                "epoch": epoch + 1
+            })
         
         # Print epoch summary
         print(f'\nEpoch {epoch+1} Summary:')
