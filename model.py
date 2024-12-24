@@ -16,28 +16,45 @@ class SimpleCNN(nn.Module):
         self.transform = transforms.Resize((64, 64))
 
         self.features = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=3, padding=1),
+            nn.Conv2d(1, 16, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(16, 16, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2)
         )
         self.flatten = nn.Flatten()
+
+        # Calculate flattened dim dynamically
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, 1, self.input_size, self.input_size)
+            dummy_output = self.features(dummy_input)
+            self.flatten_dim = self.flatten(dummy_output).shape[1]
+        
 
         # Calculate dimensions by hand:
         # resolution /(2^num_downsamples)
         # After resizing to 64x64 and going through the CNN layers:
         # Ex: input 64x64 -> 32x32 -> 16x16 -> 8x8 -> 4x4
         # Final channels = 256
-        # Final feature map 256 * 4 * 4 = 4096 
-        self.flatten_dim = 256 * 4 * 4 
+        # Final feature map 256 * 4 * 4 = 4096
+        # TODO clean this up 
+        #self.flatten_dim = 128 * 4 * 4 
+        
         self.embedding_layer = nn.Sequential(
             nn.Linear(self.flatten_dim, 1024),
             nn.ReLU(inplace=True),

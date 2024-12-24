@@ -163,7 +163,6 @@ def main():
     # Initialize model, criterion, and optimizer
     print(f"Initializing model (num_classes={num_classes})...")
     model = SimpleCNN(num_classes=num_classes).to(device)
-    wandb.watch(model, log_freq=100)
     criterion = nn.CrossEntropyLoss()
     # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     optimizer = AdamW(
@@ -200,7 +199,8 @@ def main():
             # Add any other hyperparameters
             }
         )
-    
+    wandb.watch(model, log_freq=100)
+
    
     # Training loop
     print("Starting training...")

@@ -179,6 +179,11 @@ Add a note about how the data is stored in the npz and the best way to access it
 [ ] make it so that it only saves the class averages at the end of training instead of everytime a new best model gets saved
 [ ] add a LR warmup and cosine learning rate
 [ ] experiment with weight decay
+[ ] clean up hardcoded flatten_dim
+        self.flatten_dim = 128 * 4 * 4 
+        self.embedding_layer = nn.Sequential(
+            nn.Linear(self.flatten_dim, 1024),
+[ ] experiment with triplet loss
 
 # Inference
 Our goal is to find which fonts are most similar to the unknown input font, so we need to have some idea of what all the *known* fonts look like in feature space and return the closest ones. 
