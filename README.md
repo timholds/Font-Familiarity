@@ -165,3 +165,7 @@ what is the best way to store this dataset if I wanted to make it uber scalable?
 
 Add code to download it from a public bucket
 
+Try contrastive loss
+
+Figure out how to keep track of the model experiments 
+
