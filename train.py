@@ -99,7 +99,8 @@ def evaluate(model, test_loader, criterion, device, num_classes):
             metrics_report += "\n"
         metrics_report += f"Class {cls:3d}: {per_class_acc[cls]*100:5.2f}%  "
     
-    return test_loss / len(test_loader), overall_acc * 100, metrics_report
+    return test_loss / len(test_loader), overall_acc * 100, metrics_report, per_class_acc
+
 
 def compute_class_embeddings(model, dataloader, num_classes, device):
     """Compute and store average embeddings for each class."""
@@ -189,14 +190,14 @@ def main():
         )
         
         # Evaluate
-        test_loss, test_acc, metrics_report = evaluate(
+        test_loss, test_acc, metrics_report, per_class_acc = evaluate(
             model, test_loader, criterion, device, num_classes
         )
         
         epoch_time = time.time() - start_time
         
-        # Log epoch-level metrics to wandb
-        wandb.log({
+        # Log metrics to wandb
+        metrics_dict = {
             "epoch": epoch + 1,
             "train_loss": train_loss,
             "train_acc": train_acc,
@@ -204,13 +205,13 @@ def main():
             "test_acc": test_acc,
             "epoch_time": epoch_time,
             "learning_rate": optimizer.param_groups[0]['lr']
-        })
-
+        }
+        
+        # Add per-class accuracies
         for cls in range(num_classes):
-            wandb.log({
-                f"class_{cls}_accuracy": per_class_acc[cls].item() * 100,
-                "epoch": epoch + 1
-            })
+            metrics_dict[f"class_{cls}_accuracy"] = per_class_acc[cls].item() * 100
+            
+        wandb.log(metrics_dict)
         
         # Print epoch summary
         print(f'\nEpoch {epoch+1} Summary:')
