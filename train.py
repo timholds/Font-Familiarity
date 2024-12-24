@@ -145,9 +145,46 @@ def main():
     parser.add_argument("--data_dir", default="font_dataset_npz/")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--learning_rate", type=float, default=0.0003)
+    parser.add_argument("--learning_rate", type=float, default=0.003)
     parser.add_argument("--weight_decay", type=float, default=0.01)
     args = parser.parse_args()
+
+    warmup_epochs = max(args.epochs // 5, 1)  # At least 1 epoch of warmup
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # Load data
+    print("Loading data...")
+    train_loader, test_loader, num_classes = get_dataloaders(
+        data_dir=args.data_dir,
+        batch_size=args.batch_size
+    )
+
+   
+    # Initialize model, criterion, and optimizer
+    print(f"Initializing model (num_classes={num_classes})...")
+    model = SimpleCNN(num_classes=num_classes).to(device)
+    wandb.watch(model, log_freq=100)
+    criterion = nn.CrossEntropyLoss()
+    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(
+        model.parameters(),
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay
+    )
+   
+    # Create warmup scheduler
+    warmup_scheduler = LinearLR(
+        optimizer,
+        start_factor=0.1,  # Start at 10% of base lr
+        total_iters=warmup_epochs * len(train_loader)
+    )
+
+    # Create main scheduler
+    main_scheduler = CosineAnnealingLR(
+        optimizer,
+        T_max=(args.epochs - warmup_epochs) * len(train_loader),
+        eta_min=1e-6  # Minimum learning rate
+    )
 
     wandb.init(
         project="Font-Familiarity",
@@ -163,65 +200,14 @@ def main():
             # Add any other hyperparameters
             }
         )
-    # Training settings
-    data_dir = args.data_dir
-    batch_size = args.batch_size
-    warmup_epochs = max(args.epochs // 5, 1)  # At least 1 epoch of warmup
-    epochs = args.epochs
-    learning_rate = args.learning_rate
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
-    # Create warmup scheduler
-    warmup_scheduler = LinearLR(
-        optimizer,
-        start_factor=0.1,  # Start at 10% of base lr
-        total_iters=warmup_epochs * len(train_loader)
-    )
-
-    # Create main scheduler
-    main_scheduler = CosineAnnealingLR(
-        optimizer,
-        T_max=(epochs - warmup_epochs) * len(train_loader),
-        eta_min=1e-6  # Minimum learning rate
-    )
-    # Load data
-    print("Loading data...")
-    train_loader, test_loader, num_classes = get_dataloaders(
-        data_dir=data_dir,
-        batch_size=batch_size
-    )
-    
-    # Initialize model, criterion, and optimizer
-    print(f"Initializing model (num_classes={num_classes})...")
-    model = SimpleCNN(num_classes=num_classes).to(device)
-    wandb.watch(model, log_freq=100)
-    criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    optimizer = AdamW(
-        model.parameters(),
-        lr=args.learning_rate,
-        weight_decay=args.weight_decay
-    )
-
-    # Schedulers
-    warmup_scheduler = LinearLR(
-        optimizer,
-        start_factor=0.1,
-        total_iters=warmup_epochs * len(train_loader)
-    )
-
-    main_scheduler = CosineAnnealingLR(
-        optimizer,
-        T_max=(args.epochs - warmup_epochs) * len(train_loader),
-        eta_min=1e-6
-    )
-    
+   
     # Training loop
     print("Starting training...")
     best_test_acc = 0.0
     
-    for epoch in range(epochs):
-        print(f'\nEpoch: {epoch+1}/{epochs}')
+    for epoch in range(args.epochs):
+        print(f'\nEpoch: {epoch+1}/{args.epochs}')
         start_time = time.time()
         
         # Train
@@ -278,23 +264,29 @@ def main():
         if test_acc > best_test_acc:
             best_test_acc = test_acc
             print(f"New best model! (Test Acc: {test_acc:.2f}%)")
-            
-            # Compute class embeddings using training data
-            class_embeddings = compute_class_embeddings(
-                model, train_loader, num_classes, device
-            )
-            
-            # Save both model and embeddings
-            torch.save({
+            # Store the model state without computing embeddings yet
+            best_model_state = {
                 'epoch': epoch + 1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'train_loss': train_loss,
                 'test_loss': test_loss,
                 'test_acc': test_acc,
-                'class_embeddings': class_embeddings,
                 'num_classes': num_classes
-            }, 'best_model.pt')
+            }
+
+    print("\nTraining completed!")
+    print(f"Best test accuracy: {best_test_acc:.2f}%")
+    
+    # Now compute class embeddings once at the end
+    print("Computing final class embeddings...")
+    class_embeddings = compute_class_embeddings(
+        model, train_loader, num_classes, device
+    )
+    
+    # Add embeddings to the best model state and save
+    best_model_state['class_embeddings'] = class_embeddings
+    torch.save(best_model_state, 'best_model.pt')
 
     print("\nTraining completed!")
     print(f"Best test accuracy: {best_test_acc:.2f}%")
