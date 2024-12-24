@@ -12,8 +12,8 @@ class SimpleCNN(nn.Module):
     Input: (batch_size, 1, 256, 256)
     """
     def __init__(self, num_classes: int):
-        super().__init__()
-        #self.transform = transforms.Resize((64, 64))
+        super().__init__()     
+        self.transform = transforms.Resize((64, 64))
 
         self.features = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
@@ -29,16 +29,32 @@ class SimpleCNN(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2)
         )
-        
+
+        # Adjust the input size of the first linear layer
+        # After resizing to 64x64 and going through the CNN layers:
+        # 64x64 -> 32x32 (first maxpool) -> 16x16 (second maxpool) -> 
+        # 8x8 (third maxpool) -> 4x4 (fourth maxpool)
+        # So final feature map size is 256 * 4 * 4
+
+        # Calculate dimensions by hand:
+        # resolution /(2^num_downsamples)
+        # Input 64x64 -> 32x32 -> 16x16 -> 8x8 -> 4x4
+        # Final channels = 256
+        # Therefore: 256 * 4 * 4 = 4096   
+
+        self.flatten_dim = 4096  
+        self.classifier = nn.Linear(self.flatten_dim, num_classes)
+
+
         self.classifier = nn.Sequential(
-            nn.Linear(256 * 16 * 16, 1024),
+            nn.Linear(256 * 4 * 4, 1024),
             nn.ReLU(inplace=True),
             nn.Dropout(0.5),
             nn.Linear(1024, num_classes)
         )
 
     def forward(self, x):
-        #x = self.transform(x)  # Resize the input
+        x = self.transform(x)  # Resize the input
         x = self.features(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
