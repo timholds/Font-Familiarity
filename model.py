@@ -41,7 +41,7 @@ class SimpleCNN(nn.Module):
         # Input 64x64 -> 32x32 -> 16x16 -> 8x8 -> 4x4
         # Final channels = 256
         # Therefore: 256 * 4 * 4 = 4096   
-
+        self.flatten = nn.Flatten()
         self.flatten_dim = 4096  
         self.classifier = nn.Linear(self.flatten_dim, num_classes)
 
@@ -56,7 +56,7 @@ class SimpleCNN(nn.Module):
     def forward(self, x):
         x = self.transform(x)  # Resize the input
         x = self.features(x)
-        x = x.view(x.size(0), -1)
+        x = self.flatten(x)
         x = self.classifier(x)
         return x
     
