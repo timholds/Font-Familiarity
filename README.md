@@ -1,19 +1,22 @@
 The readme is a project notes section for now.
 
 **Problem Statement**: how do we get the most similar fonts to a given font?
-[ ] data augmentation - vary positioning of the text
+[ ] data augmentation - vary positioning/layout, font size and style, color and background color, text itself 
 [ ] try a clip model of same font different font?
 [ ] train a classifier model and use the average class features to find which classes are closer or more similar to each other and return the top 5
 [ ] do we get anything out of top eigenvectors of the data covariance matrix
 [ ] distance between their mean images.
 
-# main parts
+# main software pieces
 - html files to render the text into fonts
 - flask server to put the baked html onto a webpage
-- training data generator that takes screenshots of those webpages
-- model architecture defined with pytorch 
-- file to load data and model and do the training  
-- some other file to do the similarity computation
+- selenium scraper to takes screenshots of those webpages
+- (optional) compressing the data for storage 
+- saving the data to disk as npz or pkl files
+- model architecture file
+- file to load dataset into pytorch DataLoader
+- file to handle the training loop, evaluation, metrics
+- inference and calculating the most similar fonts
 
 # questions
 - how many datapoints per class do I want if I have around 700 classes? cifar1000 archs probably a good place to start
