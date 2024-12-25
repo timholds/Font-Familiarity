@@ -84,10 +84,10 @@ def train_epoch(model, train_loader, criterion, optimizer,
         # Log batch timing metrics (every N batches to reduce noise)
         if batch_idx % 50 == 0:  # Log every 50 batches
             wandb.log({
-                "samples_per_second": target.size(0) / batch_time,
+                #"samples_per_second": target.size(0) / batch_time,
                 "learning_rate": optimizer.param_groups[0]['lr'],
-                "batch": batch_idx + epoch * len(train_loader),
-                "total_training_time": time.time() - train_start_time  # Add this as global var
+                #"batch": batch_idx + epoch * len(train_loader),
+                "total_training_time(s)": time.time() - train_start_time  # Add this as global var
             })
             batch_start_time = time.time()  # Reset for next batch
             # wandb.log({
@@ -113,13 +113,13 @@ def train_epoch(model, train_loader, criterion, optimizer,
         
     # Log epoch-level timing statistics
     avg_batch_time = sum(batch_times) / len(batch_times)
-    wandb.log({
-        "avg_batch_time": avg_batch_time,
-        # "min_batch_time": min(batch_times),
-        # "max_batch_time": max(batch_times),
-        # "batch_time_std": np.std(batch_times),
-        "total_epoch_time": sum(batch_times)
-    })
+    # wandb.log({
+    #     "avg_batch_time": avg_batch_time,
+    #     # "min_batch_time": min(batch_times),
+    #     # "max_batch_time": max(batch_times),
+    #     # "batch_time_std": np.std(batch_times),
+    #     "total_epoch_time": sum(batch_times)
+    # })
     
     return running_loss / len(train_loader), 100. * correct / total
 
@@ -219,7 +219,7 @@ def main():
     )
     # wandb.define_metric("batch_loss", step_metric="batch")
     # wandb.define_metric("batch_acc", step_metric="batch")
-    # wandb.define_metric("*", step_metric="epoch")
+    wandb.define_metric("*", step_metric="epoch")
 
     config = wandb.config
 
@@ -291,12 +291,12 @@ def main():
         
         # Log metrics to wandb
         metrics_dict = {
-            "epoch": epoch + 1,
+            #"epoch": epoch + 1,
             "train_loss": train_loss,
             "train_acc": train_acc,
             "test_loss": test_loss,
             "test_acc": test_acc,
-            "epoch_time": epoch_time,
+            "epoch_time(s)": epoch_time,
             "learning_rate": optimizer.param_groups[0]['lr']
         }
                 
@@ -337,7 +337,6 @@ def main():
                 "best_test_acc": best_test_acc,
                 "final_train_loss": train_loss,
                 "epochs_to_best": epoch + 1,
-                "worst5_best": metrics_dict["class_acc_worst5"],  # Track best performance on worst classes
                 "throughput_avg": metrics_dict.get("samples_per_second", 0),
                 "train_test_gap": abs(train_acc - test_acc)  # Track potential overfitting
             })
