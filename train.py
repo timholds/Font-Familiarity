@@ -33,7 +33,9 @@ def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_clas
     
     return overall_acc, per_class_acc
 
-def train_epoch(model, train_loader, criterion, optimizer, device, epoch):
+def train_epoch(model, train_loader, criterion, optimizer,
+                 device, epoch, warmup_epochs, warmup_scheduler,
+                main_scheduler, train_start_time):
     model.train()
     running_loss = 0.0
     correct = 0
@@ -66,6 +68,11 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch):
         # Calculate total batch time
         batch_time = time.time() - batch_start_time
         batch_times.append(batch_time)
+
+        if epoch < warmup_epochs:
+            warmup_scheduler.step()
+        else:
+            main_scheduler.step()
         
         # Regular training metrics
         running_loss += loss.item()
@@ -77,20 +84,29 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch):
         # Log batch timing metrics (every N batches to reduce noise)
         if batch_idx % 50 == 0:  # Log every 50 batches
             wandb.log({
-                "batch_time": batch_time,
-                "data_transfer_time": data_transfer_time,
-                "forward_backward_time": forward_backward_time,
-                "optimizer_time": optimizer_time,
                 "samples_per_second": target.size(0) / batch_time,
-                "global_step": batch_idx + len(train_loader) * epoch
+                "learning_rate": optimizer.param_groups[0]['lr'],
+                "batch": batch_idx + epoch * len(train_loader),
+                "total_training_time": time.time() - train_start_time  # Add this as global var
             })
+            batch_start_time = time.time()  # Reset for next batch
+            # wandb.log({
+            #     "batch_time": batch_time,
+            #     "data_transfer_time": data_transfer_time,
+            #     "forward_backward_time": forward_backward_time,
+            #     "optimizer_time": optimizer_time,
+            #     "samples_per_second": target.size(0) / batch_time,
+            #     "global_step": batch_idx + len(train_loader) * epoch
+            # })
         
         # Update progress bar with timing info
         pbar.set_postfix({
             'loss': f'{loss.item():.3f}',
             'acc': f'{100. * correct / total:.2f}%',
             'batch_time': f'{batch_time:.3f}s',
-            'samples/sec': f'{target.size(0) / batch_time:.1f}'
+            'samples/sec': f'{target.size(0) / batch_time:.1f}',
+            "total_training_time": time.time() - train_start_time  # Add this as global var
+
         })
         
         batch_start_time = time.time()  # Reset for next batch
@@ -99,9 +115,9 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch):
     avg_batch_time = sum(batch_times) / len(batch_times)
     wandb.log({
         "avg_batch_time": avg_batch_time,
-        "min_batch_time": min(batch_times),
-        "max_batch_time": max(batch_times),
-        "batch_time_std": np.std(batch_times),
+        # "min_batch_time": min(batch_times),
+        # "max_batch_time": max(batch_times),
+        # "batch_time_std": np.std(batch_times),
         "total_epoch_time": sum(batch_times)
     })
     
@@ -201,18 +217,10 @@ def main():
             "optimizer": "AdamW"
         }
     )
-    wandb.define_metric("batch_loss", step_metric="batch")
-    wandb.define_metric("batch_acc", step_metric="batch")
-    wandb.define_metric("*", step_metric="epoch")
+    # wandb.define_metric("batch_loss", step_metric="batch")
+    # wandb.define_metric("batch_acc", step_metric="batch")
+    # wandb.define_metric("*", step_metric="epoch")
 
-    # If you want custom panels/charts, use this instead of log_config:
-    wandb.log({"custom_chart": wandb.plot.line_series(
-        xs=[[1, 2, 3], [1, 2, 3]],
-        ys=[[1, 2, 3], [2, 3, 4]],
-        keys=["train_acc", "test_acc"],
-        title="Training Progress",
-        xname="Epoch"
-    )})
     config = wandb.config
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -250,21 +258,22 @@ def main():
 
     main_scheduler = CosineAnnealingLR(
         optimizer,
-        T_max=(config.epochs - warmup_epochs) * len(train_loader),
+        T_max=(config.epochs - warmup_epochs) * len(train_loader),  # Total number of steps
         eta_min=1e-6
     )
    
     # Training loop
     print("Starting training...")
     best_test_acc = 0.0
-    
+    train_start_time = time.time()
     for epoch in range(args.epochs):
         print(f'\nEpoch: {epoch+1}/{args.epochs}')
         start_time = time.time()
         
         # Train
         train_loss, train_acc = train_epoch(
-            model, train_loader, criterion, optimizer, device, epoch
+            model, train_loader, criterion, optimizer, device, epoch,
+            warmup_epochs, warmup_scheduler, main_scheduler, train_start_time  # Pass schedulers
         )
 
         # Step the appropriate scheduler
@@ -291,12 +300,13 @@ def main():
             "learning_rate": optimizer.param_groups[0]['lr']
         }
                 
-        class_accs = per_class_acc * 100  # Convert to percentages
-        metrics_dict.update({
-            "class_acc_spread": class_accs.std().item(),  # Measure of class imbalance
-            "class_acc_worst5": torch.mean(torch.topk(class_accs, k=5, largest=False)[0]).item(),  # Average of 5 worst classes
-            "class_acc_best5": torch.mean(torch.topk(class_accs, k=5, largest=True)[0]).item(),  # Average of 5 best classes
-            })
+        #class_accs = per_class_acc * 100  # Convert to percentages
+        # In your evaluate() function, ensure this calculation is correct:
+        # metrics_dict.update({
+        #     "class_acc_worst5": torch.mean(torch.topk(class_accs, k=5, largest=False)[0]).item(),
+        #     "class_acc_best5": torch.mean(torch.topk(class_accs, k=5, largest=True)[0]).item(),  # Make sure this is logging
+        #     "class_acc_spread": class_accs.std().item()
+        # })
     
         wandb.log(metrics_dict)
         
@@ -321,6 +331,16 @@ def main():
                 'test_acc': test_acc,
                 'num_classes': num_classes
             }
+
+        if (epoch + 1) % 5 == 0 or epoch == args.epochs - 1:  # Every 5 epochs and last epoch
+            wandb.run.summary.update({
+                "best_test_acc": best_test_acc,
+                "final_train_loss": train_loss,
+                "epochs_to_best": epoch + 1,
+                "worst5_best": metrics_dict["class_acc_worst5"],  # Track best performance on worst classes
+                "throughput_avg": metrics_dict.get("samples_per_second", 0),
+                "train_test_gap": abs(train_acc - test_acc)  # Track potential overfitting
+            })
 
     print("\nTraining completed!")
     print(f"Best test accuracy: {best_test_acc:.2f}%")
