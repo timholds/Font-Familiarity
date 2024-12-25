@@ -159,6 +159,7 @@ def main():
     # Initialize wandb and get config right after parsing args
     wandb.init(
         project="Font-Familiarity",
+        name=f"experiment_{time.strftime('%Y-%m-%d_%H-%M-%S')}",
         config={
             **vars(args),
             "architecture": "CNN",
@@ -263,7 +264,7 @@ def main():
         print(f'Time taken: {epoch_time:.2f}s')
         print(f'Train Loss: {train_loss:.3f} | Train Acc: {train_acc:.2f}%')
         print(f'Test Loss: {test_loss:.3f} | Test Acc: {test_acc:.2f}%')
-        print(metrics_report)
+        #print(metrics_report)
         
         # Save if best model
         if test_acc > best_test_acc:

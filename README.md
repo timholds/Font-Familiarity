@@ -167,11 +167,13 @@ Imagine the space of image augmentations that would be helpful if we wanted to l
 [ ] Experiment with weight decay
 [ ] Test single conv layers vs back to back conv layers between downsamples
 [ ] Add a wandb config file and sweep conv sizes
-
+[ ] Compare my model to a LoRA of gemmapali or a multimodal llama
 
 # TODO 
-what is the best way to store this dataset if I wanted to make it uber scalable? Store it on AWS S3 as compressed
--Add code to download dataset from a public bucket
+[ ] remove the model saving part for the sweep. once we know which model trains best we can retrain it and reanble the saving.
+[ ] cleanup the metrics 
+- [ ] is the epoch time metric actually telling me how long an epoch takes?
+
 
 [X] Figure out how to keep track of the model experiments - use weights and biases 
 
@@ -205,6 +207,11 @@ So if Font_A with n images, we get one 1024-dim vector representing the "average
 
 -TODO some explaining about high dimensional representations where all the datapoints are super far from each other so being close in one dimension ends up being close in 
 -TODO does it matter whether you take the class average over the train set vs the validation or test set?
+
+
+# Misc
+what is the best way to store this dataset if I wanted to make it uber scalable? Store it on AWS S3 as compressed
+-Add code to download dataset from a public bucket
 
 Do I need to do any regularization?
 

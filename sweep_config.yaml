@@ -5,16 +5,16 @@ metric:
   goal: maximize
 parameters:
   embedding_dim:
-    values: [256, 512, 1024]
-  input_size:
+    values: [512, 1024]
+  resolution:
     values: [64, 128]
   initial_channels:
     values: [16, 32]
   learning_rate:
     values: [0.001, 0.003]
   batch_size:
-    values: [64]
+    values: [128]
   weight_decay:
     value: 0.01
   epochs:
-    value: 30
+    value: 15
