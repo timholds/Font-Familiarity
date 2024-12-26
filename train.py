@@ -11,6 +11,9 @@ from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR
 from torch.optim import AdamW  # Consider using AdamW instead of Adam
 import numpy as np
 
+# Add this with your other imports at the top of the file
+from metrics import ClassificationMetrics
+
 
 def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_classes: int):
     """Calculate per-class and overall metrics using PyTorch."""
@@ -123,38 +126,42 @@ def train_epoch(model, train_loader, criterion, optimizer,
     
     return running_loss / len(train_loader), 100. * correct / total
 
-def evaluate(model, test_loader, criterion, device, num_classes):
+def evaluate(model, test_loader, criterion, device, metrics_calculator):
+    """
+    Evaluate the model on the test set.
+    Returns test loss and all classification metrics.
+    """
     model.eval()
     test_loss = 0
-    predictions = []
-    targets = []
+    all_logits = []
+    all_targets = []
     
     with torch.no_grad():
         for data, target in tqdm(test_loader, desc='Evaluating'):
             data, target = data.to(device), target.to(device)
-            output = model(data)
-            test_loss += criterion(output, target).item()
-            _, pred = output.max(1)
+            logits = model(data)
             
-            predictions.append(pred)
-            targets.append(target)
+            # Calculate loss
+            test_loss += criterion(logits, target).item()
+            
+            # Store predictions and targets for metric calculation
+            all_logits.append(logits)
+            all_targets.append(target)
     
     # Concatenate all batches
-    predictions = torch.cat(predictions)
-    targets = torch.cat(targets)
+    all_logits = torch.cat(all_logits)
+    all_targets = torch.cat(all_targets)
     
-    # Calculate metrics
-    overall_acc, per_class_acc = calculate_metrics(predictions, targets, num_classes)
+    # Calculate average loss
+    avg_test_loss = test_loss / len(test_loader)
     
-    # Format metrics for printing
-    metrics_report = "\nPer-class accuracies:\n"
-    for cls in range(num_classes):
-        if cls % 5 == 0 and cls != 0:  # Add newline every 5 classes
-            metrics_report += "\n"
-        metrics_report += f"Class {cls:3d}: {per_class_acc[cls]*100:5.2f}%  "
+    # Compute all metrics
+    metrics = metrics_calculator.compute_all_metrics(all_logits, all_targets)
     
-    return test_loss / len(test_loader), overall_acc * 100, metrics_report, per_class_acc
-
+    # Add loss to metrics dictionary
+    metrics['test_loss'] = avg_test_loss
+    
+    return metrics
 
 def compute_class_embeddings(model, dataloader, num_classes, device):
     """Compute and store average embeddings for each class."""
@@ -217,8 +224,8 @@ def main():
             "optimizer": "AdamW"
         }
     )
-    # wandb.define_metric("batch_loss", step_metric="batch")
-    # wandb.define_metric("batch_acc", step_metric="batch")
+    wandb.define_metric("batch_loss", step_metric="batch")
+    wandb.define_metric("batch_acc", step_metric="batch")
     wandb.define_metric("*", step_metric="epoch")
 
     config = wandb.config
@@ -242,6 +249,8 @@ def main():
 
     # Watch model right after it's created
     wandb.watch(model, log_freq=100)
+    metrics_calculator = ClassificationMetrics(num_classes=num_classes, device=device)
+
 
     criterion = nn.CrossEntropyLoss()
     optimizer = AdamW(
@@ -283,11 +292,16 @@ def main():
             main_scheduler.step()
         
         # Evaluate
-        test_loss, test_acc, metrics_report, per_class_acc = evaluate(
-            model, test_loader, criterion, device, num_classes
+        model, test_loader, criterion, device, metrics_calculator
+        metrics = evaluate(
+            model, test_loader, criterion, device, metrics_calculator
         )
         
         epoch_time = time.time() - start_time
+
+        wandb.log(metrics)
+        test_loss = metrics['test_loss']
+        test_acc = metrics['top1_acc']
         
         # Log metrics to wandb
         metrics_dict = {
@@ -309,6 +323,7 @@ def main():
         # })
     
         wandb.log(metrics_dict)
+      
         
         # Print epoch summary
         print(f'\nEpoch {epoch+1} Summary:')
