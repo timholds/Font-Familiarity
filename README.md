@@ -28,12 +28,18 @@ The readme is a project notes section for now.
 [ X ] get the script to render the text on an html page in the correct font
 [ X ] figure out how much data I need
 [ X ] get the screenshots saving with minimal overlap
-[ X ] collect a dataset of 
+[ X ] collect a dataset of screenshots
+[ ] make a website that is capable of taking in images of fonts and returning out similar fonts 
 
 # ML steps and ideas
 [ ] train a distance model on cifar to make sure the idea works
 [ ] figure out how to get the mean image of a class
 [ ] how many examples per class do we need
+
+## Metrics TODO
+[ ] remove or debug empty classes metric
+[ ] remove acc std
+[ ] do I need step and epoch time charts?
 
 "Data Impressions: Mining Deep Models to
 Extract Samples for Data-free Applications" (2021)
