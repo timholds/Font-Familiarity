@@ -86,7 +86,9 @@ def train_epoch(model, train_loader, criterion, optimizer,
         
         # Log batch timing metrics (every N batches to reduce noise)
         if batch_idx % 50 == 0:  # Log every 50 batches
+            global_step = batch_idx + epoch * len(train_loader)
             wandb.log({
+                "step": global_step, 
                 #"samples_per_second": target.size(0) / batch_time,
                 "learning_rate": optimizer.param_groups[0]['lr'],
                 #"batch": batch_idx + epoch * len(train_loader),
@@ -302,10 +304,13 @@ def main():
         wandb.log(metrics)
         test_loss = metrics['test_loss']
         test_acc = metrics['top1_acc']
+
+        global_step = (epoch + 1) * len(train_loader) 
         
         # Log metrics to wandb
         metrics_dict = {
-            #"epoch": epoch + 1,
+            "step": global_step,
+            "epoch": epoch + 1,
             "train_loss": train_loss,
             "train_acc": train_acc,
             "test_loss": test_loss,
