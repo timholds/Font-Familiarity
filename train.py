@@ -36,97 +36,7 @@ def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_clas
     
     return overall_acc, per_class_acc
 
-# def train_epoch(model, train_loader, criterion, optimizer,
-#                  device, epoch, warmup_epochs, warmup_scheduler,
-#                 main_scheduler, train_start_time):
-#     model.train()
-#     running_loss = 0.0
-#     correct = 0
-#     total = 0
-    
-#     # Add timing metrics
-#     batch_start_time = time.time()
-#     batch_times = []
-    
-#     pbar = tqdm(train_loader, desc='Training')
-#     for batch_idx, (data, target) in enumerate(pbar):
-#         # Time the data transfer
-#         data_transfer_start = time.time()
-#         data, target = data.to(device), target.to(device)
-#         data_transfer_time = time.time() - data_transfer_start
-        
-#         # Time the forward/backward pass
-#         forward_start = time.time()
-#         optimizer.zero_grad()
-#         output = model(data)
-#         loss = criterion(output, target)
-#         loss.backward()
-#         forward_backward_time = time.time() - forward_start
-        
-#         # Time the optimizer step
-#         optimizer_start = time.time()
-#         optimizer.step()
-#         optimizer_time = time.time() - optimizer_start
-        
-#         # Calculate total batch time
-#         batch_time = time.time() - batch_start_time
-#         batch_times.append(batch_time)
 
-#         if epoch < warmup_epochs:
-#             warmup_scheduler.step()
-#         else:
-#             main_scheduler.step()
-        
-#         # Regular training metrics
-#         running_loss += loss.item()
-#         _, predicted = output.max(1)
-#         total += target.size(0)
-#         batch_correct = predicted.eq(target).sum().item()
-#         correct += batch_correct
-        
-#         # Log batch timing metrics (every N batches to reduce noise)
-#         if batch_idx % 50 == 0:  # Log every 50 batches
-#             global_step = batch_idx + epoch * len(train_loader)
-#             wandb.log({
-#                 "step": global_step, 
-#                 #"samples_per_second": target.size(0) / batch_time,
-#                 "learning_rate": optimizer.param_groups[0]['lr'],
-#                 #"batch": batch_idx + epoch * len(train_loader),
-#                 "total_training_time(s)": time.time() - train_start_time  # Add this as global var
-#             })
-#             batch_start_time = time.time()  # Reset for next batch
-#             # wandb.log({
-#             #     "batch_time": batch_time,
-#             #     "data_transfer_time": data_transfer_time,
-#             #     "forward_backward_time": forward_backward_time,
-#             #     "optimizer_time": optimizer_time,
-#             #     "samples_per_second": target.size(0) / batch_time,
-#             #     "global_step": batch_idx + len(train_loader) * epoch
-#             # })
-        
-#         # Update progress bar with timing info
-#         pbar.set_postfix({
-#             'loss': f'{loss.item():.3f}',
-#             'acc': f'{100. * correct / total:.2f}%',
-#             'batch_time': f'{batch_time:.3f}s',
-#             'samples/sec': f'{target.size(0) / batch_time:.1f}',
-#             "total_training_time": time.time() - train_start_time  # Add this as global var
-
-#         })
-        
-#         batch_start_time = time.time()  # Reset for next batch
-        
-#     # Log epoch-level timing statistics
-#     avg_batch_time = sum(batch_times) / len(batch_times)
-#     # wandb.log({
-#     #     "avg_batch_time": avg_batch_time,
-#     #     # "min_batch_time": min(batch_times),
-#     #     # "max_batch_time": max(batch_times),
-#     #     # "batch_time_std": np.std(batch_times),
-#     #     "total_epoch_time": sum(batch_times)
-#     # })
-    
-#     return running_loss / len(train_loader), 100. * correct / total
 def train_epoch(model, train_loader, criterion, optimizer, device, epoch, 
                 warmup_epochs, warmup_scheduler, main_scheduler, metrics_calculator):
     """Train for one epoch."""
@@ -192,42 +102,6 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch,
     
     return running_loss
 
-# def evaluate(model, test_loader, criterion, device, metrics_calculator):
-#     """
-#     Evaluate the model on the test set.
-#     Returns test loss and all classification metrics.
-#     """
-#     model.eval()
-#     test_loss = 0
-#     all_logits = []
-#     all_targets = []
-    
-#     with torch.no_grad():
-#         for data, target in tqdm(test_loader, desc='Evaluating'):
-#             data, target = data.to(device), target.to(device)
-#             logits = model(data)
-            
-#             # Calculate loss
-#             test_loss += criterion(logits, target).item()
-            
-#             # Store predictions and targets for metric calculation
-#             all_logits.append(logits)
-#             all_targets.append(target)
-    
-#     # Concatenate all batches
-#     all_logits = torch.cat(all_logits)
-#     all_targets = torch.cat(all_targets)
-    
-#     # Calculate average loss
-#     avg_test_loss = test_loss / len(test_loader)
-    
-#     # Compute all metrics
-#     metrics = metrics_calculator.compute_all_metrics(all_logits, all_targets)
-    
-#     # Add loss to metrics dictionary
-#     metrics['test_loss'] = avg_test_loss
-    
-#     return metrics
 
 def evaluate(model, test_loader, criterion, device, metrics_calculator, epoch=None):
     """Evaluate the model."""
@@ -437,6 +311,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 # import torch
 # from torch import nn
 # from torch.utils.data import Dataset, DataLoader
