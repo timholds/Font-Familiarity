@@ -53,17 +53,17 @@ class ClassificationMetrics:
             'batch_loss': loss,
             'batch_acc': accuracy,
             'batch_time': batch_time,
-            'samples_per_second': samples_per_second,
+            #'samples_per_second': samples_per_second,
             'total_training_time': total_training_time
         })
         
         # Add detailed timing breakdown if provided
-        if batch_times:
-            metrics.update({
-                'data_transfer_time': batch_times.get('data_transfer', 0),
-                'forward_backward_time': batch_times.get('forward_backward', 0),
-                'optimizer_time': batch_times.get('optimizer', 0)
-            })
+        # if batch_times:
+        #     metrics.update({
+        #         'data_transfer_time': batch_times.get('data_transfer', 0),
+        #         'forward_backward_time': batch_times.get('forward_backward', 0),
+        #         'optimizer_time': batch_times.get('optimizer', 0)
+        #     })
         
         # Add learning rate if optimizer provided
         if optimizer:

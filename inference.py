@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from PIL import Image
 from model import FontEmbeddingModel  # your model class
 
+
 class FontMatcher:
     def __init__(self, model_path, class_embeddings_path, device='cuda'):
         self.device = device

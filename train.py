@@ -11,32 +11,6 @@ from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR
 from torch.optim import AdamW
 from metrics import ClassificationMetrics
 
-# Add this with your other imports at the top of the file
-from metrics import ClassificationMetrics
-
-
-def calculate_metrics(predictions: torch.Tensor, targets: torch.Tensor, num_classes: int):
-    """Calculate per-class and overall metrics using PyTorch."""
-    # Convert to 1D tensors if needed
-    predictions = predictions.view(-1)
-    targets = targets.view(-1)
-    
-    # Calculate per-class metrics
-    per_class_correct = torch.zeros(num_classes, device=predictions.device)
-    per_class_total = torch.zeros(num_classes, device=predictions.device)
-    
-    for cls in range(num_classes):
-        cls_mask = targets == cls
-        per_class_correct[cls] = (predictions[cls_mask] == cls).sum()
-        per_class_total[cls] = cls_mask.sum()
-    
-    # Calculate metrics
-    per_class_acc = per_class_correct / per_class_total
-    overall_acc = per_class_correct.sum() / per_class_total.sum()
-    
-    return overall_acc, per_class_acc
-
-
 def train_epoch(model, train_loader, criterion, optimizer, device, epoch, 
                 warmup_epochs, warmup_scheduler, main_scheduler, metrics_calculator):
     """Train for one epoch."""
