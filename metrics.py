@@ -95,7 +95,7 @@ class ClassificationMetrics:
         metrics.update(self._compute_per_class_metrics(top1_pred, targets))
         metrics.update(self._compute_distribution_metrics(probs, targets))
         metrics.update(self._compute_reliability_metrics(probs, targets, top1_pred))
-        metrics.update(self._compute_map(probs, targets))
+        # metrics.update(self._compute_map(probs, targets))
         metrics.update(self._compute_logit_stats(logits))
         
         # Training dynamics metrics
@@ -169,6 +169,7 @@ class ClassificationMetrics:
             })
         
         return metrics
+    
     def _compute_topk_accuracy(self, logits: torch.Tensor, targets: torch.Tensor) -> Dict[str, float]:
         """Compute top-k accuracy metrics."""
         metrics = {}
@@ -208,7 +209,7 @@ class ClassificationMetrics:
             'mean_per_class_acc': per_class_acc[valid_classes].mean().item() * 100,
             'worst5_acc': per_class_acc[valid_classes].topk(5, largest=False)[0].mean().item() * 100,
             'best5_acc': per_class_acc[valid_classes].topk(5, largest=True)[0].mean().item() * 100,
-            'acc_std': per_class_acc[valid_classes].std().item() * 100,
+            #'acc_std': per_class_acc[valid_classes].std().item() * 100,
             'median_acc': per_class_acc[valid_classes].median().item() * 100
         }
         

@@ -16,29 +16,22 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch,
     """Train for one epoch."""
     model.train()
     running_loss = 0.0
+    total_correct = 0
+    total_samples = 0
     
     pbar = tqdm(train_loader, desc=f'Epoch {epoch+1}')
     for batch_idx, (data, target) in enumerate(pbar):
-        # Start timing this batch
         metrics_calculator.start_batch()
         
-        # Time data transfer
-        data_transfer_start = time.time()
+        # Forward pass and compute loss
         data, target = data.to(device), target.to(device)
-        data_transfer_time = time.time() - data_transfer_start
-        
-        # Forward/backward pass
-        forward_start = time.time()
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, target)
-        loss.backward()
-        forward_backward_time = time.time() - forward_start
         
-        # Optimizer step
-        optimizer_start = time.time()
+        # Backward pass
+        loss.backward()
         optimizer.step()
-        optimizer_time = time.time() - optimizer_start
         
         # Update schedulers
         if epoch < warmup_epochs:
@@ -46,69 +39,85 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch,
         else:
             main_scheduler.step()
         
-        # Compute batch metrics
-        batch_metrics = metrics_calculator.compute_batch_metrics(
-            logits=output,
-            targets=target,
-            loss=loss.item(),
-            batch_size=target.size(0),
-            optimizer=optimizer,
-            batch_times={
-                'data_transfer': data_transfer_time,
-                'forward_backward': forward_backward_time,
-                'optimizer': optimizer_time
-            }
-        )
-        
+        # Update running statistics
         running_loss = (running_loss * batch_idx + loss.item()) / (batch_idx + 1)
+        pred = output.argmax(dim=1)
+        total_correct += (pred == target).sum().item()
+        total_samples += target.size(0)
+        current_acc = 100. * total_correct / total_samples
         
-        # Log metrics periodically
+        # Compute and log batch metrics
         if batch_idx % 50 == 0:
-            batch_metrics['global_step'] = batch_idx + epoch * len(train_loader)
+            batch_metrics = {
+                'train/batch_loss': loss.item(),
+                'train/running_loss': running_loss,
+                'train/running_acc': current_acc,
+                'train/learning_rate': optimizer.param_groups[0]['lr'],
+                'global_step': batch_idx + epoch * len(train_loader)
+            }
             wandb.log(batch_metrics)
         
-        # Update progress bar
-        pbar.set_postfix(
-            metrics_calculator.get_progress_bar_stats(
-                loss.item(), output, target, target.size(0)
-            )
-        )
+        # Update progress bar with basic metrics
+        pbar.set_postfix({
+            'loss': f'{loss.item():.3f}',
+            'avg_loss': f'{running_loss:.3f}',
+            'acc': f'{current_acc:.2f}%',
+            'lr': f'{optimizer.param_groups[0]["lr"]:.6f}'
+        })
     
-    return running_loss
-
+    # Compute final training metrics
+    train_metrics = {
+        'train/loss': running_loss,
+        'train/top1_acc': current_acc,  # Changed to match test metrics naming
+        'train/samples': total_samples,
+    }
+    
+    return train_metrics
 
 def evaluate(model, test_loader, criterion, device, metrics_calculator, epoch=None):
     """Evaluate the model."""
     model.eval()
     test_loss = 0
-    all_logits = []
-    all_targets = []
+    correct = 0
+    total = 0
+    
+    # For computing top-5 accuracy
+    top5_correct = 0
     
     with torch.no_grad():
         for data, target in tqdm(test_loader, desc='Evaluating'):
             data, target = data.to(device), target.to(device)
-            logits = model(data)
+            output = model(data)
             
-            test_loss += criterion(logits, target).item()
-            all_logits.append(logits)
-            all_targets.append(target)
+            # Compute loss
+            test_loss += criterion(output, target).item()
+            
+            # Compute top-1 accuracy
+            pred = output.argmax(dim=1)
+            correct += (pred == target).sum().item()
+            
+            # Compute top-5 accuracy
+            _, pred5 = output.topk(5, 1, True, True)
+            target_expanded = target.view(-1, 1).expand_as(pred5)
+            correct5 = pred5.eq(target_expanded).any(dim=1).sum().item()
+            top5_correct += correct5
+            
+            total += target.size(0)
     
-    # Concatenate all batches
-    all_logits = torch.cat(all_logits)
-    all_targets = torch.cat(all_targets)
+    # Compute average metrics
+    avg_loss = test_loss / len(test_loader)
+    top1_acc = 100. * correct / total
+    top5_acc = 100. * top5_correct / total
     
-    # Compute metrics
-    metrics = metrics_calculator.compute_all_metrics(
-        logits=all_logits,
-        targets=all_targets,
-        model=model,
-        epoch=epoch
-    )
+    # Create metrics dictionary
+    test_metrics = {
+        'test/loss': avg_loss,
+        'test/top1_acc': top1_acc,
+        'test/top5_acc': top5_acc,
+        'test/samples': total,
+    }
     
-    # Add loss to metrics
-    metrics['test_loss'] = test_loss / len(test_loader)
-    
-    return metrics
+    return test_metrics
 
 def compute_class_embeddings(model, dataloader, num_classes, device):
     """Compute and store average embeddings for each class."""
@@ -218,16 +227,16 @@ def main():
         eta_min=1e-6
     )
     
-    # Training loop
     print("Starting training...")
     best_test_acc = 0.0
-    metrics_calculator.reset_timing()  # Start timing from here
+    metrics_calculator.reset_timing()
     
     for epoch in range(args.epochs):
-        start_time = time.time()
+        print(f'\nEpoch: {epoch+1}/{args.epochs}')
+        epoch_start_time = time.time()
         
         # Train
-        train_loss = train_epoch(
+        train_metrics = train_epoch(
             model, train_loader, criterion, optimizer, device, epoch,
             warmup_epochs, warmup_scheduler, main_scheduler, metrics_calculator
         )
@@ -237,33 +246,46 @@ def main():
             model, test_loader, criterion, device, metrics_calculator, epoch
         )
         
-        # Add training metrics
-        test_metrics.update({
-            'train_loss': train_loss,
-            'epoch_time': time.time() - start_time,
-            'learning_rate': optimizer.param_groups[0]['lr'],
-        })
+        # Combine metrics and add epoch info
+        combined_metrics = {
+            'epoch': epoch + 1,
+            'epoch_time': time.time() - epoch_start_time,
+            **train_metrics,
+            **test_metrics
+        }
         
         # Log all metrics
-        wandb.log(test_metrics)
+        wandb.log(combined_metrics)
+        
+        # Extract key metrics for printing and model saving
+        train_loss = train_metrics['train/loss']
+        test_loss = test_metrics['test/loss']
+        train_acc = train_metrics['train/top1_acc']  # Updated to match new key
+        test_acc = test_metrics['test/top1_acc']     # Updated to match new key
         
         # Print epoch summary
-        print(f'\nEpoch {epoch+1} Summary:')
-        print(f'Train Loss: {train_loss:.3f}')
-        print(f'Test Loss: {test_metrics["test_loss"]:.3f}')
-        print(f'Test Acc: {test_metrics["top1_acc"]:.2f}%')
-        print(f'Top-5 Acc: {test_metrics["top5_acc"]:.2f}%')
-        print(f'Mean Per-Class Acc: {test_metrics["mean_per_class_acc"]:.2f}%')
+        print('\nEpoch Summary:')
+        print(f'Train Loss: {train_loss:.3f} | Train Acc: {train_acc:.2f}%')
+        print(f'Test Loss:  {test_loss:.3f} | Test Acc:  {test_acc:.2f}%')
+        print(f'Test Top-5 Acc: {test_metrics["test/top5_acc"]:.2f}%')
+        print(f'Learning Rate: {optimizer.param_groups[0]["lr"]:.6f}')
         
-        # Save best model
-        if test_metrics['top1_acc'] > best_test_acc:
-            best_test_acc = test_metrics['top1_acc']
-            print(f"New best model! (Test Acc: {best_test_acc:.2f}%)")
+        # Only print top-5 acc if available
+        if 'test/top5_acc' in test_metrics:
+            print(f'Test Top-5 Acc: {test_metrics["test/top5_acc"]:.2f}%')
+        
+        print(f'Learning Rate: {optimizer.param_groups[0]["lr"]:.6f}')
+        
+        # Save best model based on test accuracy
+        if test_acc > best_test_acc:
+            best_test_acc = test_acc
+            print(f"New best model! (Test Acc: {test_acc:.2f}%)")
             best_model_state = {
                 'epoch': epoch + 1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'metrics': test_metrics,
+                'train_metrics': train_metrics,
+                'test_metrics': test_metrics,
                 'num_classes': num_classes
             }
         
@@ -272,8 +294,10 @@ def main():
             wandb.run.summary.update({
                 "best_test_acc": best_test_acc,
                 "final_train_loss": train_loss,
+                "final_test_loss": test_loss,
                 "epochs_to_best": epoch + 1,
-                "train_test_gap": abs(test_metrics['train_loss'] - test_metrics['test_loss'])
+                "train_test_gap": abs(train_loss - test_loss),
+                "final_train_test_acc_gap": abs(train_acc - test_acc)
             })
     
     print("\nTraining completed!")

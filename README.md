@@ -29,7 +29,14 @@ The readme is a project notes section for now.
 [ X ] figure out how much data I need
 [ X ] get the screenshots saving with minimal overlap
 [ X ] collect a dataset of screenshots
-[ ] make a website that is capable of taking in images of fonts and returning out similar fonts 
+[ X ] get the full sized model to train in colab on an A100
+    - taking ~90/s per iteration
+Make sure that the metrics look right and wandb 
+[  ] Get a sweep working on colab
+[ ] make a simple frontend that is capable of taking in images of fonts and returning out similar fonts
+[ ] make a pretty frontend - maybe pay someone or ask conor
+[ ] start generating data augmentations
+metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation
 
 # ML steps and ideas
 [ ] train a distance model on cifar to make sure the idea works
