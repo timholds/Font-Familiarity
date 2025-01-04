@@ -303,15 +303,6 @@ class ClassificationMetrics:
         
         return {'mean_ap': mean_ap}
     
-    # [Previous helper methods remain unchanged]
-    # _compute_per_class_metrics
-    # _compute_distribution_metrics
-    # _compute_reliability_metrics
-    # _compute_map
-    # _compute_logit_stats
-    # _compute_prediction_churn
-    # _compute_gradient_stats
-    
     def get_progress_bar_stats(self, 
                              loss: float,
                              logits: torch.Tensor,
