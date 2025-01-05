@@ -69,7 +69,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device, epoch,
     train_metrics = {
         'train/loss': running_loss,
         'train/top1_acc': current_acc,  # Changed to match test metrics naming
-        'train/samples': total_samples,
+        #'train/samples': total_samples,
     }
     
     return train_metrics
@@ -114,7 +114,7 @@ def evaluate(model, test_loader, criterion, device, metrics_calculator, epoch=No
         'test/loss': avg_loss,
         'test/top1_acc': top1_acc,
         'test/top5_acc': top5_acc,
-        'test/samples': total,
+        #'test/samples': total,
     }
     
     return test_metrics
@@ -311,6 +311,14 @@ def main():
     print("\nTraining completed!")
     print(f"Best test accuracy: {best_test_acc:.2f}%")
     print("Calculating class embeddings for each font using the training data")
+
+    class_embeddings = compute_class_embeddings(
+        model, train_loader, num_classes, device
+    )
+    
+    # Add embeddings to the best model state and save
+    best_model_state['class_embeddings'] = class_embeddings
+    torch.save(best_model_state, 'best_model.pt')
 
 
 if __name__ == "__main__":
