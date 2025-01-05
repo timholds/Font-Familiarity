@@ -11,6 +11,21 @@ from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR
 from torch.optim import AdamW
 from metrics import ClassificationMetrics
 
+from prettytable import PrettyTable
+
+def count_parameters(model):
+    table = PrettyTable(["Modules", "Parameters"])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad:
+            continue
+        params = parameter.numel()
+        table.add_row([name, params])
+        total_params += params
+    print(table)
+    print(f"Total Trainable Params: {total_params}")
+    return total_params
+
 def train_epoch(model, train_loader, criterion, optimizer, device, epoch, 
                 warmup_epochs, warmup_scheduler, main_scheduler, metrics_calculator):
     """Train for one epoch."""
@@ -230,6 +245,14 @@ def main():
         input_size=args.resolution,
         initial_channels=args.initial_channels
     ).to(device)
+
+
+    total_params     = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f'Total params {total_params}')
+    print(f'Trainable params {trainable_params}')
+    count_parameters(model)
+
     
     # Initialize metrics calculator
     metrics_calculator = ClassificationMetrics(num_classes=num_classes, device=device)
@@ -319,7 +342,7 @@ def main():
             }
 
             # Save best model
-            model_name = f"fontCNN_BS{args.batch_size}-ED{args.embedding_dim}-IC{args.initial_channels}-{time.strftime('%Y-%m-%d_%H-%M')}.pt"
+            model_name = f"fontCNN_BS{args.batch_size}-ED{args.embedding_dim}-IC{args.initial_channels}.pt"
             torch.save(best_model_state, model_name)
         
         # Update wandb summary periodically
