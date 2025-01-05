@@ -78,25 +78,31 @@ def evaluate(model, test_loader, criterion, device, metrics_calculator, epoch=No
     """Evaluate the model."""
     model.eval()
     test_loss = 0
-    correct = 0
-    total = 0
+    all_logits = []
+    all_targets = []
     
-    # For computing top-5 accuracy
+    # Basic accuracy tracking
+    correct = 0
     top5_correct = 0
+    total = 0
     
     with torch.no_grad():
         for data, target in tqdm(test_loader, desc='Evaluating'):
             data, target = data.to(device), target.to(device)
             output = model(data)
             
-            # Compute loss
+            # Accumulate tensors for advanced metrics
+            all_logits.append(output)
+            all_targets.append(target)
+            
+            # Compute basic metrics on the fly
             test_loss += criterion(output, target).item()
             
-            # Compute top-1 accuracy
+            # Top-1 accuracy
             pred = output.argmax(dim=1)
             correct += (pred == target).sum().item()
             
-            # Compute top-5 accuracy
+            # Top-5 accuracy
             _, pred5 = output.topk(5, 1, True, True)
             target_expanded = target.view(-1, 1).expand_as(pred5)
             correct5 = pred5.eq(target_expanded).any(dim=1).sum().item()
@@ -104,18 +110,36 @@ def evaluate(model, test_loader, criterion, device, metrics_calculator, epoch=No
             
             total += target.size(0)
     
-    # Compute average metrics
+    # Compute basic metrics
     avg_loss = test_loss / len(test_loader)
     top1_acc = 100. * correct / total
     top5_acc = 100. * top5_correct / total
     
-    # Create metrics dictionary
+    # Initialize metrics dictionary with basic metrics
     test_metrics = {
         'test/loss': avg_loss,
         'test/top1_acc': top1_acc,
         'test/top5_acc': top5_acc,
-        #'test/samples': total,
+        'test/samples': total,
     }
+    
+    # Compute advanced metrics on the entire test set
+    all_logits = torch.cat(all_logits)
+    all_targets = torch.cat(all_targets)
+    
+    # Get advanced metrics from the metrics calculator
+    advanced_metrics = metrics_calculator.compute_all_metrics(
+        logits=all_logits,
+        targets=all_targets,
+        model=model,
+        epoch=epoch
+    )
+    
+    # Add advanced metrics with 'test/' prefix, excluding duplicates
+    for key, value in advanced_metrics.items():
+        # Skip metrics we already have
+        if key not in ['top1_acc', 'top5_acc', 'loss']:
+            test_metrics[f'test/{key}'] = value
     
     return test_metrics
 
@@ -295,7 +319,8 @@ def main():
             }
 
             # Save best model
-            torch.save(best_model_state, 'best_model.pt')
+            model_name = f"fontCNN_BS{args.batch_size}-ED{args.embedding_dim}-IC{args.initial_channels}-{time.strftime('%Y-%m-%d_%H-%M')}.pt"
+            torch.save(best_model_state, model_name)
         
         # Update wandb summary periodically
         if (epoch + 1) % 5 == 0 or epoch == args.epochs - 1:
@@ -312,13 +337,13 @@ def main():
     print(f"Best test accuracy: {best_test_acc:.2f}%")
     print("Calculating class embeddings for each font using the training data")
 
-    class_embeddings = compute_class_embeddings(
-        model, train_loader, num_classes, device
-    )
+    # class_embeddings = compute_class_embeddings(
+    #     model, train_loader, num_classes, device
+    # )
     
-    # Add embeddings to the best model state and save
-    best_model_state['class_embeddings'] = class_embeddings
-    torch.save(best_model_state, 'best_model.pt')
+    # # Add embeddings to the best model state and save
+    # best_model_state['class_embeddings'] = class_embeddings
+    # torch.save(best_model_state, 'best_model.pt')
 
 
 if __name__ == "__main__":
