@@ -192,6 +192,11 @@ def main():
         data_dir=args.data_dir,
         batch_size=args.batch_size
     )
+
+    print(f"num training batches {len(train_loader)}")
+    print(f"num training datapoints {len(train_loader.dataset)}")
+    print(f"num test batches {len(test_loader)}")
+    print(f"num tes datapoints {len(test_loader.dataset)}")
     
     # Initialize model
     print(f"Initializing model (num_classes={num_classes})...")
@@ -288,6 +293,9 @@ def main():
                 'test_metrics': test_metrics,
                 'num_classes': num_classes
             }
+
+            # Save best model
+            torch.save(best_model_state, 'best_model.pt')
         
         # Update wandb summary periodically
         if (epoch + 1) % 5 == 0 or epoch == args.epochs - 1:
@@ -302,9 +310,7 @@ def main():
     
     print("\nTraining completed!")
     print(f"Best test accuracy: {best_test_acc:.2f}%")
-    
-    # Save best model
-    torch.save(best_model_state, 'best_model.pt')
+    print("Calculating class embeddings for each font using the training data")
 
 
 if __name__ == "__main__":

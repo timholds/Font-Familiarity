@@ -37,6 +37,14 @@ Make sure that the metrics look right and wandb
 [ ] make a pretty frontend - maybe pay someone or ask conor
 [ ] start generating data augmentations
 metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation
+[ ] make the validation dataset smaller
+[ ] add back model saving during the epochs instead of just at the end. i think there is a bug rn such that it saves the network state after the last epoch regardless of whether that's the best model or not.
+[ ] write a script to run to generate class embeddings using the training data after generating and saving the best train model so i can have multiple models saved and each of them can generate their own class embeddings
+[ ] figure out what data format to store the class embeddings in so that they can be used inside a flask app
+[ ] figure out how a flask app is supposed to g 
+
+# Training experiments
+First idea is just to get the loss to go down for train and test over a 30 epoch run with a tiny 3M parameter network.
 
 # ML steps and ideas
 [ ] train a distance model on cifar to make sure the idea works
