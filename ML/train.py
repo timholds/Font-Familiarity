@@ -194,7 +194,7 @@ def compute_class_embeddings(model, dataloader, num_classes, device):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="font_dataset_npz_test/")
+    parser.add_argument("--data_dir", default="data/font_dataset_npz_test/")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--learning_rate", type=float, default=0.003)
