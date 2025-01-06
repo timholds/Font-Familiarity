@@ -47,7 +47,7 @@ class FontRenderer:
                  text_file: str = 'lorem_ipsum.txt',
                  output_dir: str = 'font-images',
                  template_dir: str = 'templates',
-                 port: int = 5000,
+                 port: int = 5100,
                  image_size: tuple = (256, 256),  # Reduced from 512x512
                  image_quality: int = 80):        # JPEG quality (0-100)):  # Reduced to 1 for stability
         self.fonts = self._load_fonts(fonts_file)
@@ -222,8 +222,8 @@ class FontRenderer:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--text_file', default='lorem_ipsum.txt')
-    parser.add_argument('--font_file', default='fonts.txt')
+    parser.add_argument('--text_file', default='data_generation/lorem_ipsum.txt')
+    parser.add_argument('--font_file', default='data_generation/fonts.txt')
     parser.add_argument('--image_resolution', default=128)
     args = parser.parse_args()
 
