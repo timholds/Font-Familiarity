@@ -236,8 +236,6 @@ def main():
     args = parser.parse_args()
 
     # suggest new arguments copilot!
-    
-    breakpoint()
     renderer = FontRenderer(
         fonts_file=args.font_file,
         text_file=args.text_file,
