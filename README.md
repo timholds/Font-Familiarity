@@ -20,6 +20,7 @@ The readme is a project notes section for now.
 
 # questions
 - how many datapoints per class do I want if I have around 700 classes? cifar1000 archs probably a good place to start
+- Is it better just to keep the classifier and return the top 5 classes or to omit the classifier and just use the get_embeddings() part of the model to extract the features and then compare that to the average features of each class?
 
 
 # TODO

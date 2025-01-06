@@ -106,7 +106,6 @@ class SimpleCNN(nn.Module):
         self.classifier = nn.Linear(embedding_dim, num_classes)
 
 
-
     def get_embedding(self, x):
         x = self.transform(x)
         x = self.features(x)
