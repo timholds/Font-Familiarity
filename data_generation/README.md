@@ -19,3 +19,5 @@ lorem.ipsom
 TODO add arg for the html canvas size to create_font_images and for the number of images to generate per class
 
 Rerun it with a different directory than fonts-images2 and use the fonts.txt instead of full-fonts-list.txt
+
+TODO add argparsing to prep_train_test_data.py so that it grabs the right dataset

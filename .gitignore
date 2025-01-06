@@ -19,3 +19,4 @@ font-images*.zip
 font_dataset_npz*/
 __pycache__/
 *.pyc
+*.log

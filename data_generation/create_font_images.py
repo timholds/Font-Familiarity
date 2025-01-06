@@ -49,7 +49,8 @@ class FontRenderer:
                  template_dir: str = 'templates',
                  port: int = 5100,
                  image_size: tuple = (256, 256),  # Reduced from 512x512
-                 image_quality: int = 80):        # JPEG quality (0-100)):  # Reduced to 1 for stability
+                 image_quality: int = 80, # JPEG quality (0-100))
+                 num_samples_per_font: int = 10):        
         self.fonts = self._load_fonts(fonts_file)
         self.text = self._load_text(text_file)
         self.output_dir = Path(output_dir)
@@ -58,6 +59,7 @@ class FontRenderer:
 
         self.image_size = image_size
         self.image_quality = image_quality
+        self.num_samples_per_font = num_samples_per_font
         self.scroll_height = 400
         self.flask_app = None
         self.server_thread = None
@@ -112,7 +114,11 @@ class FontRenderer:
             def render_font(font_name):
                 font_config = FontConfig(
                     name=font_name,
-                    output_path=self.output_dir / font_name.lower().replace(' ', '_')
+                    output_path=self.output_dir / font_name.lower().replace(' ', '_'),
+                    # image_width=self.image_size[0],
+                    # image_height=self.image_size[1],
+                    # font_size=24,
+                    # samples_per_font=args.samples_per_class
                 )
                 return render_template(
                     'single_font.html',
@@ -213,7 +219,7 @@ class FontRenderer:
         for font in self.fonts:
             try:
                 logger.info(f"Processing font: {font}")
-                self._capture_font_screenshots(font)
+                self._capture_font_screenshots(font, num_samples=self.num_samples_per_font)
             except Exception as e:
                 logger.error(f"Failed to process font {font}: {e}")
                 continue
@@ -224,17 +230,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--text_file', default='data_generation/lorem_ipsum.txt')
     parser.add_argument('--font_file', default='data_generation/fonts.txt')
-    parser.add_argument('--image_resolution', default=128)
+    parser.add_argument('--image_resolution', default=256, type=int)
+    parser.add_argument('--samples_per_class', default=10, type=int)
+    parser.add_argument('--image_quality', default=10, type=int)
     args = parser.parse_args()
 
+    # suggest new arguments copilot!
+    
+    breakpoint()
     renderer = FontRenderer(
         fonts_file=args.font_file,
         text_file=args.text_file,
         output_dir='font-images3',
         template_dir='templates',
         image_size=(args.image_resolution, args.image_resolution),  # Smaller size
-        #image_size=(128, 128),  # Smaller size
-        image_quality=10
+        image_quality=args.image_quality,
+        num_samples_per_font=args.samples_per_class
     )
     
     try:

@@ -24,6 +24,8 @@ The readme is a project notes section for now.
 
 
 # TODO
+[ ]  update the data generation to something less crude than this original ugly hack - text = text * 10  # Repeat text to ensure enough content
+[ ] 
 [ X ] get the script reading the text from the lorum_ipsom.txt file
 [ X ] get the fonts read in to the html page from fonts.txt
 [ X ] get the script to render the text on an html page in the correct font
