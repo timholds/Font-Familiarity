@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template
+import os
 import torch
 import numpy as np
 from PIL import Image
@@ -31,15 +32,11 @@ def load_model_and_embeddings(model_path: str,
                             label_mapping_path: str) -> None:
     """
     Initialize model and load pre-computed class embeddings.
-    
-    Args:
-        model_path: Path to trained model checkpoint
-        embeddings_path: Path to class embeddings .npy file
-        label_mapping_path: Path to label mapping file
     """
     global model, class_embeddings, device, label_mapping
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"\nUsing device: {device}")
     
     # Load model state
     state = torch.load(model_path, map_location=device)
@@ -62,15 +59,17 @@ def load_model_and_embeddings(model_path: str,
     # Initialize model with correct parameters
     model = SimpleCNN(
         num_classes=num_classes,
-        embedding_dim=embedding_dim  # This is 128, not 2048
+        embedding_dim=embedding_dim
     ).to(device)
     model.load_state_dict(state_dict)
     model.eval()
     
-    # Load pre-computed class embeddings (shape: [num_classes, embedding_dim])
+    # Load pre-computed class embeddings
+    print(f"\nLoading embeddings from: {embeddings_path}")
     class_embeddings = torch.from_numpy(np.load(embeddings_path)).to(device)
     
     # Load label mapping
+    print(f"Loading label mapping from: {label_mapping_path}")
     label_mapping = np.load(label_mapping_path, allow_pickle=True).item()
     
     print("\nModel and embeddings loaded successfully!")
@@ -79,45 +78,27 @@ def load_model_and_embeddings(model_path: str,
     print(f"Class embeddings shape: {class_embeddings.shape}")
 
 def preprocess_image(image_bytes: bytes) -> torch.Tensor:
-    """
-    Convert uploaded image bytes to normalized tensor.
-    
-    Args:
-        image_bytes: Raw bytes of uploaded image
-
-    Returns:
-        tensor: Preprocessed image tensor of shape [1, 1, 64, 64]
-    """
+    """Convert uploaded image bytes to tensor."""
     # Open image and convert to grayscale
     image = Image.open(io.BytesIO(image_bytes)).convert('L')
     
-    # Define preprocessing to match training
+    # Define preprocessing
     transform = transforms.Compose([
         transforms.Resize((64, 64)),
-        transforms.ToTensor(),  # Scales to [0, 1]
+        transforms.ToTensor(),
     ])
     
     # Apply preprocessing and add batch dimension
-    tensor = transform(image).unsqueeze(0)  # Shape: [1, 1, 64, 64]
+    tensor = transform(image).unsqueeze(0)  # Add batch dimension
     return tensor.to(device)
 
 def get_top_k_similar_fonts(query_embedding: torch.Tensor, k: int = 5) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Find k most similar fonts using embedding cosine similarity.
-    
-    Args:
-        query_embedding: Tensor of shape [1, embedding_dim]
-        k: Number of similar fonts to return
-
-    Returns:
-        indices: Array of top k most similar font indices
-        similarities: Array of corresponding similarity scores
-    """
+    """Find k most similar fonts using embedding similarity."""
     # Normalize query embedding for cosine similarity
     query_embedding = F.normalize(query_embedding, p=2, dim=1)
     
     # Compute cosine similarity with all class embeddings
-    similarities = torch.mm(query_embedding, class_embeddings.t())  # Shape: [1, num_classes]
+    similarities = torch.mm(query_embedding, class_embeddings.t())
     
     # Get top k similarities and indices
     top_k_similarities, top_k_indices = similarities[0].topk(k)
@@ -125,26 +106,34 @@ def get_top_k_similar_fonts(query_embedding: torch.Tensor, k: int = 5) -> tuple[
     return top_k_indices.cpu().numpy(), top_k_similarities.cpu().numpy()
 
 def get_top_k_predictions(logits: torch.Tensor, k: int = 5) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Get top k predictions from classifier logits.
-    
-    Args:
-        logits: Raw model outputs of shape [1, num_classes]
-        k: Number of predictions to return
-
-    Returns:
-        indices: Array of top k predicted class indices
-        probabilities: Array of corresponding probabilities
-    """
+    """Get top k predictions from classifier."""
     probabilities = F.softmax(logits, dim=1)
     top_k_probs, top_k_indices = probabilities[0].topk(k)
     
     return top_k_indices.cpu().numpy(), top_k_probs.cpu().numpy()
 
+@app.route('/test')
+def test():
+    """Test route to verify Flask is working."""
+    return "Flask server is running!"
+
 @app.route('/')
 def index():
     """Serve the main page."""
-    return render_template('frontend.html')
+    print("\n=== Request received for index page ===")
+    print("Current working directory:", os.path.abspath(os.curdir))
+    print("Template folder:", os.path.abspath(os.path.join(os.curdir, 'templates')))
+    print("Available templates:", os.listdir('templates'))
+    
+    try:
+        print("Attempting to serve frontend.html template...")
+        return render_template('frontend.html')
+    except Exception as e:
+        print(f"Error rendering template: {str(e)}")
+        import traceback
+        print("Full traceback:")
+        print(traceback.format_exc())
+        return f"Error: {str(e)}", 500
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -187,6 +176,7 @@ def predict():
             })
     
     except Exception as e:
+        print(f"Error processing prediction: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
@@ -194,10 +184,18 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", required=True, help="Path to trained model .pt file")
-    parser.add_argument("--embeddings_path", default="class_embeddings.npy", help="Path to class embeddings .npy file")
-    parser.add_argument("--label_mapping_path", default="font_dataset_npz/label_mapping.npy", help="Path to label_mapping.npy file")
-    parser.add_argument("--port", type=int, default=6000)
+    parser.add_argument("--embeddings_path", default="class_embeddings.npy",
+                       help="Path to class embeddings .npy file")
+    parser.add_argument("--label_mapping_path", default="font_dataset_npz/label_mapping.npy",
+                       help="Path to label_mapping.npy file")
+    parser.add_argument("--port", type=int, default=8080)
     args = parser.parse_args()
+    
+    print("\nInitializing Flask app...")
+    print(f"Port: {args.port}")
+    print(f"Model path: {args.model_path}")
+    print(f"Embeddings path: {args.embeddings_path}")
+    print(f"Label mapping path: {args.label_mapping_path}")
     
     # Load model and embeddings
     load_model_and_embeddings(
@@ -206,5 +204,11 @@ if __name__ == '__main__':
         args.label_mapping_path
     )
     
+    print(f"\nStarting Flask server on port {args.port}...")
+    print(f"You can access the app at:")
+    print(f"  http://localhost:{args.port}")
+    print(f"  http://127.0.0.1:{args.port}")
+    print("Use Ctrl+C to stop the server\n")
+    
     # Start Flask app
-    app.run(host='0.0.0.0', port=args.port)
+    app.run(host='0.0.0.0', port=args.port, debug=True)
