@@ -24,27 +24,30 @@ The readme is a project notes section for now.
 
 
 # TODO
-[ ]  update the data generation to something less crude than this original ugly hack - text = text * 10  # Repeat text to ensure enough content
+[ ]  update the data generation to something less crude than this original ugly hack - text = text * 10  # Repeat text to ensure enough content  
 [ ] 
-[ X ] get the script reading the text from the lorum_ipsom.txt file
-[ X ] get the fonts read in to the html page from fonts.txt
-[ X ] get the script to render the text on an html page in the correct font
-[ X ] figure out how much data I need
-[ X ] get the screenshots saving with minimal overlap
-[ X ] collect a dataset of screenshots
-[ X ] get the full sized model to train in colab on an A100
-    - taking ~90/s per iteration
-Make sure that the metrics look right and wandb 
-[  ] Get a sweep working on colab
-[ ] make a simple frontend that is capable of taking in images of fonts and returning out similar fonts
-[ ] make a pretty frontend - maybe pay someone or ask conor
-[ ] start generating data augmentations
-metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation
-[ ] make the validation dataset smaller
-[ ] add back model saving during the epochs instead of just at the end. i think there is a bug rn such that it saves the network state after the last epoch regardless of whether that's the best model or not.
-[ ] write a script to run to generate class embeddings using the training data after generating and saving the best train model so i can have multiple models saved and each of them can generate their own class embeddings
-[ ] figure out what data format to store the class embeddings in so that they can be used inside a flask app
-[ ] figure out how a flask app is supposed to g 
+[ X ] get the script reading the text from the lorum_ipsom.txt file  
+[ X ] get the fonts read in to the html page from fonts.txt  
+[ X ] get the script to render the text on an html page in the correct font  
+[ X ] figure out how much data I need  
+[ X ] get the screenshots saving with minimal overlap  
+[ X ] collect a dataset of screenshots  
+[ X ] get the full sized model to train in colab on an A100  
+    - taking ~90/s per iteration  
+Make sure that the metrics look right and wandb   
+[  ] Get a sweep working on colab  
+
+[ ] get the flask app to launch for the frontend using the model and class embeddings
+[ ] make a simple frontend that is capable of taking in images of fonts and returning out similar fonts  
+[ ] make a pretty frontend - maybe pay someone or ask conor  
+[ ] start generating data augmentations  
+metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation  
+[ ] make the validation dataset smaller  
+[ ] add back model saving during the epochs instead of just at the end. i think there is a bug rn such that it saves the network state after the last epoch regardless of whether that's the best model or not.  
+[ ] write a script to run to generate class embeddings using the training data after generating and saving the best train model so i can have multiple models saved and each of them can generate their own class embeddings  
+[ ] figure out what data format to store the class embeddings in so that they can be used inside a flask app   
+[ ] figure out how a flask app is supposed to work  
+
 
 # Training experiments
 First idea is just to get the loss to go down for train and test over a 30 epoch run with a tiny 3M parameter network.

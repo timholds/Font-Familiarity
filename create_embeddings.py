@@ -1,7 +1,7 @@
 import torch
 import numpy as np
-from ML.model import SimpleCNN
-from ML.dataset import get_dataloaders
+from ml.model import SimpleCNN
+from ml.dataset import get_dataloaders
 import argparse
 from tqdm import tqdm
 
@@ -130,7 +130,7 @@ def main():
     #     batch_size=args.batch_size
     # )
 
-    from ML.dataset import FontDataset
+    from ml.dataset import FontDataset
     from torch.utils.data import DataLoader
 
     test_dataset = FontDataset(args.data_dir, train=False)
