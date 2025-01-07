@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import torch
 import numpy as np
 from PIL import Image
@@ -141,6 +141,11 @@ def get_top_k_predictions(logits: torch.Tensor, k: int = 5) -> tuple[np.ndarray,
     
     return top_k_indices.cpu().numpy(), top_k_probs.cpu().numpy()
 
+@app.route('/')
+def index():
+    """Serve the main page."""
+    return render_template('frontend.html')
+
 @app.route('/predict', methods=['POST'])
 def predict():
     """Endpoint for font prediction using both similarity and classification approaches."""
@@ -183,7 +188,6 @@ def predict():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     import argparse
