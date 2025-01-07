@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Font Similarity Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Font Similarity Search</h1>
+        
+        <div class="upload-section">
+            <form id="uploadForm">
+                <input type="file" id="imageInput" accept="image/*">
+                <button type="submit">Analyze Font</button>
+            </form>
+            <div id="preview"></div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-column">
+                <h2>Similar Fonts (Embedding)</h2>
+                <div id="embeddingResults"></div>
+            </div>
+            
+            <div class="results-column">
+                <h2>Classifier Predictions</h2>
+                <div id="classifierResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select an image first');
+                return;
+            }
+
+            // Show preview
+            const preview = document.getElementById('preview');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Display results
+                const embeddingResults = document.getElementById('embeddingResults');
+                const classifierResults = document.getElementById('classifierResults');
+                
+                embeddingResults.innerHTML = data.embedding_similarity.map(result => `
+                    <div class="result-item">
+                        <span class="font-name">${result.font}</span>
+                        <span class="score">${(result.similarity * 100).toFixed(1)}%</span>
+                    </div>
+                `).join('');
+                
+                classifierResults.innerHTML = data.classifier_predictions.map(result => `
+                    <div class="result-item">
+                        <span class="font-name">${result.font}</span>
+                        <span class="score">${(result.probability * 100).toFixed(1)}%</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing image');
+            }
+        });
+    </script>
+</body>
+</html>
