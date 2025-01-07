@@ -7,90 +7,104 @@ import io
 import torchvision.transforms as transforms
 from ml.model import SimpleCNN
 import torch.nn.functional as F
+import traceback
+import logging
+import argparse
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-"""
-Model architecture flow:
-1. Input image (1, 64, 64)
-2. CNN layers -> (128, 4, 4)
-3. Flatten -> 2048
-4. Embedding layer -> 128
-5. Classifier -> num_classes
-
-We use the 128-dimensional embeddings for similarity comparison.
-"""
-
 # Global variables
 model = None
-class_embeddings = None  # Shape: [num_classes, embedding_dim]
+class_embeddings = None
 device = None
 label_mapping = None
+is_initialized = False
 
 def load_model_and_embeddings(model_path: str, 
                             embeddings_path: str, 
                             label_mapping_path: str) -> None:
-    """
-    Initialize model and load pre-computed class embeddings.
-    """
-    global model, class_embeddings, device, label_mapping
+    """Initialize model and load pre-computed class embeddings."""
+    global model, class_embeddings, device, label_mapping, is_initialized
     
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"\nUsing device: {device}")
-    
-    # Load model state
-    state = torch.load(model_path, map_location=device)
-    state_dict = state['model_state_dict']
-    
-    # Extract architecture parameters from state dict
-    embedding_weight = state_dict['embedding_layer.0.weight']  # Shape: [embedding_dim, flatten_dim]
-    classifier_weight = state_dict['classifier.weight']        # Shape: [num_classes, embedding_dim]
-    
-    # Get dimensions from the weights
-    embedding_dim = embedding_weight.shape[0]  # 128 (dimension of learned features)
-    flatten_dim = embedding_weight.shape[1]    # 2048 (128 channels * 4 * 4)
-    num_classes = classifier_weight.shape[0]   # Number of font classes
-    
-    print("\nModel architecture from checkpoint:")
-    print(f"- Flattened CNN features: {flatten_dim} (128 channels * 4 * 4 spatial)")
-    print(f"- Embedding dimension: {embedding_dim}")
-    print(f"- Number of classes: {num_classes}")
-    
-    # Initialize model with correct parameters
-    model = SimpleCNN(
-        num_classes=num_classes,
-        embedding_dim=embedding_dim
-    ).to(device)
-    model.load_state_dict(state_dict)
-    model.eval()
-    
-    # Load pre-computed class embeddings
-    print(f"\nLoading embeddings from: {embeddings_path}")
-    class_embeddings = torch.from_numpy(np.load(embeddings_path)).to(device)
-    
-    # Load label mapping
-    print(f"Loading label mapping from: {label_mapping_path}")
-    label_mapping = np.load(label_mapping_path, allow_pickle=True).item()
-    
-    print("\nModel and embeddings loaded successfully!")
-    print(f"Number of classes: {len(label_mapping)}")
-    print(f"Embedding dimension: {embedding_dim}")
-    print(f"Class embeddings shape: {class_embeddings.shape}")
+    try:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        logger.info(f"Using device: {device}")
+        
+        # Verify files exist
+        for path in [model_path, embeddings_path, label_mapping_path]:
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"Required file not found: {path}")
+        
+        # Load model state
+        logger.info(f"Loading model from {model_path}")
+        state = torch.load(model_path, map_location=device)
+        state_dict = state['model_state_dict']
+        
+        # Extract architecture parameters
+        embedding_weight = state_dict['embedding_layer.0.weight']
+        classifier_weight = state_dict['classifier.weight']
+        
+        embedding_dim = embedding_weight.shape[0]
+        flatten_dim = embedding_weight.shape[1]
+        num_classes = classifier_weight.shape[0]
+        
+        logger.info(f"Model architecture: embedding_dim={embedding_dim}, "
+                   f"flatten_dim={flatten_dim}, num_classes={num_classes}")
+        
+        # Initialize and load model
+        model = SimpleCNN(
+            num_classes=num_classes,
+            embedding_dim=embedding_dim
+        ).to(device)
+        model.load_state_dict(state_dict)
+        model.eval()
+        
+        # Load embeddings
+        logger.info(f"Loading embeddings from {embeddings_path}")
+        class_embeddings = torch.from_numpy(np.load(embeddings_path)).to(device)
+        
+        # Load label mapping
+        logger.info(f"Loading label mapping from {label_mapping_path}")
+        label_mapping = np.load(label_mapping_path, allow_pickle=True).item()
+        
+        is_initialized = True
+        logger.info("Model initialization completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Error during model initialization: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 def preprocess_image(image_bytes: bytes) -> torch.Tensor:
     """Convert uploaded image bytes to tensor."""
-    # Open image and convert to grayscale
-    image = Image.open(io.BytesIO(image_bytes)).convert('L')
-    
-    # Define preprocessing
-    transform = transforms.Compose([
-        transforms.Resize((64, 64)),
-        transforms.ToTensor(),
-    ])
-    
-    # Apply preprocessing and add batch dimension
-    tensor = transform(image).unsqueeze(0)  # Add batch dimension
-    return tensor.to(device)
+    try:
+        # Open image and convert to grayscale
+        image = Image.open(io.BytesIO(image_bytes)).convert('L')
+        logger.info(f"Loaded image, size: {image.size}")
+        
+        # Define preprocessing
+        transform = transforms.Compose([
+            transforms.Resize((64, 64)),
+            transforms.ToTensor(),
+        ])
+        
+        # Apply preprocessing and add batch dimension
+        tensor = transform(image).unsqueeze(0)
+        logger.info(f"Preprocessed tensor shape: {tensor.shape}")
+        
+        return tensor.to(device)
+        
+    except Exception as e:
+        logger.error(f"Error preprocessing image: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 def get_top_k_similar_fonts(query_embedding: torch.Tensor, k: int = 5) -> tuple[np.ndarray, np.ndarray]:
     """Find k most similar fonts using embedding similarity."""
@@ -120,36 +134,47 @@ def test():
 @app.route('/')
 def index():
     """Serve the main page."""
-    print("\n=== Request received for index page ===")
-    print("Current working directory:", os.path.abspath(os.curdir))
-    print("Template folder:", os.path.abspath(os.path.join(os.curdir, 'templates')))
-    print("Available templates:", os.listdir('templates'))
+    logger.info("Received request for index page")
+    logger.info(f"Current working directory: {os.path.abspath(os.curdir)}")
+    logger.info(f"Template folder: {os.path.abspath(os.path.join(os.curdir, 'templates'))}")
     
     try:
-        print("Attempting to serve frontend.html template...")
+        templates_dir = os.path.join(os.curdir, 'templates')
+        if os.path.exists(templates_dir):
+            logger.info(f"Available templates: {os.listdir(templates_dir)}")
+        else:
+            logger.error(f"Templates directory not found: {templates_dir}")
+            return "Error: Templates directory not found", 500
+            
         return render_template('frontend.html')
     except Exception as e:
-        print(f"Error rendering template: {str(e)}")
-        import traceback
-        print("Full traceback:")
-        print(traceback.format_exc())
+        logger.error(f"Error rendering template: {str(e)}")
+        logger.error(traceback.format_exc())
         return f"Error: {str(e)}", 500
 
 @app.route('/predict', methods=['POST'])
 def predict():
     """Endpoint for font prediction using both similarity and classification approaches."""
+    if not is_initialized:
+        return jsonify({'error': 'Model not initialized'}), 500
+        
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
     
     try:
         # Get and preprocess image
         image_bytes = request.files['image'].read()
+        logger.info(f"Received image, size: {len(image_bytes)} bytes")
+        
         image_tensor = preprocess_image(image_bytes)
         
         with torch.no_grad():
-            # Get embedding (128-dim) and classifier output
-            embedding = model.get_embedding(image_tensor)  # Shape: [1, embedding_dim]
-            logits = model.classifier(embedding)           # Shape: [1, num_classes]
+            # Get embedding and classifier output
+            embedding = model.get_embedding(image_tensor)
+            logger.info(f"Generated embedding, shape: {embedding.shape}")
+            
+            logits = model.classifier(embedding)
+            logger.info(f"Generated logits, shape: {logits.shape}")
             
             # Get predictions using both methods
             emb_indices, emb_scores = get_top_k_similar_fonts(embedding)
@@ -176,12 +201,15 @@ def predict():
             })
     
     except Exception as e:
-        print(f"Error processing prediction: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Error processing prediction: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'error': f"Error processing image: {str(e)}",
+            'details': traceback.format_exc()
+        }), 500
 
-if __name__ == '__main__':
-    import argparse
-    
+def main():
+    """Initialize and run the Flask application."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", required=True, help="Path to trained model .pt file")
     parser.add_argument("--embeddings_path", default="class_embeddings.npy",
@@ -191,24 +219,39 @@ if __name__ == '__main__':
     parser.add_argument("--port", type=int, default=8080)
     args = parser.parse_args()
     
-    print("\nInitializing Flask app...")
-    print(f"Port: {args.port}")
-    print(f"Model path: {args.model_path}")
-    print(f"Embeddings path: {args.embeddings_path}")
-    print(f"Label mapping path: {args.label_mapping_path}")
+    logger.info("\nInitializing Flask app...")
+    logger.info(f"Port: {args.port}")
+    logger.info(f"Model path: {args.model_path}")
+    logger.info(f"Embeddings path: {args.embeddings_path}")
+    logger.info(f"Label mapping path: {args.label_mapping_path}")
+    
+    # Verify required directories exist
+    for directory in ['templates', 'static']:
+        dir_path = os.path.join(os.curdir, directory)
+        if not os.path.exists(dir_path):
+            logger.error(f"Required directory not found: {dir_path}")
+            raise FileNotFoundError(f"Required directory not found: {dir_path}")
     
     # Load model and embeddings
-    load_model_and_embeddings(
-        args.model_path,
-        args.embeddings_path,
-        args.label_mapping_path
-    )
+    try:
+        load_model_and_embeddings(
+            args.model_path,
+            args.embeddings_path,
+            args.label_mapping_path
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize model: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
     
-    print(f"\nStarting Flask server on port {args.port}...")
-    print(f"You can access the app at:")
-    print(f"  http://localhost:{args.port}")
-    print(f"  http://127.0.0.1:{args.port}")
-    print("Use Ctrl+C to stop the server\n")
+    logger.info(f"\nStarting Flask server on port {args.port}...")
+    logger.info("You can access the app at:")
+    logger.info(f"  http://localhost:{args.port}")
+    logger.info(f"  http://127.0.0.1:{args.port}")
+    logger.info("Use Ctrl+C to stop the server\n")
     
     # Start Flask app
     app.run(host='0.0.0.0', port=args.port, debug=True)
+
+if __name__ == '__main__':
+    main()

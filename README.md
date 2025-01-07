@@ -37,16 +37,17 @@ The readme is a project notes section for now.
 Make sure that the metrics look right and wandb   
 [  ] Get a sweep working on colab  
 
-[ ] get the flask app to launch for the frontend using the model and class embeddings
+[ X ] get the flask app to launch for the frontend using the model and class embeddings
 [ ] make a simple frontend that is capable of taking in images of fonts and returning out similar fonts  
 [ ] make a pretty frontend - maybe pay someone or ask conor  
 [ ] start generating data augmentations  
-metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation  
+ 
 [ ] make the validation dataset smaller  
 [ ] add back model saving during the epochs instead of just at the end. i think there is a bug rn such that it saves the network state after the last epoch regardless of whether that's the best model or not.  
 [ ] write a script to run to generate class embeddings using the training data after generating and saving the best train model so i can have multiple models saved and each of them can generate their own class embeddings  
 [ ] figure out what data format to store the class embeddings in so that they can be used inside a flask app   
 [ ] figure out how a flask app is supposed to work  
+[ ] once the website it live, would be nice to be able to save the font images people are uploading so we can get a better idea of what kind of data augmentations to do
 
 
 # Training experiments
@@ -242,6 +243,8 @@ So if Font_A with n images, we get one 1024-dim vector representing the "average
 # Misc
 what is the best way to store this dataset if I wanted to make it uber scalable? Store it on AWS S3 as compressed
 -Add code to download dataset from a public bucket
+- try uploading to huggingface again
 
 Do I need to do any regularization?
 
+metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation 
