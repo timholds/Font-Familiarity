@@ -248,3 +248,8 @@ what is the best way to store this dataset if I wanted to make it uber scalable?
 Do I need to do any regularization?
 
 metrics are a clusterfuck right now. i really want probably 12 metrics right now, the most important being test validation 
+
+Establish a baaaaseline baseline with a one layer MLP
+Establish simple conv baseline for the encoder
+Test a resnet as the encoder
+Test a resnet with supervised contrastive loss (does it need to be a pretrain)

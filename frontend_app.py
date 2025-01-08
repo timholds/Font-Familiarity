@@ -180,6 +180,15 @@ def predict():
             emb_indices, emb_scores = get_top_k_similar_fonts(embedding)
             cls_indices, cls_probs = get_top_k_predictions(logits)
             
+            logger.info(f"Embedding indices: {emb_indices}")
+            logger.info(f"Classifier indices: {cls_indices}")
+            
+            # Validate indices before conversion
+            all_indices = np.concatenate([emb_indices, cls_indices])
+            invalid_indices = [idx for idx in all_indices if idx not in label_mapping]
+            if invalid_indices:
+                raise ValueError(f"Found invalid indices not in label mapping: {invalid_indices}")
+            
             # Convert indices to font names
             embedding_results = [
                 {
@@ -207,7 +216,7 @@ def predict():
             'error': f"Error processing image: {str(e)}",
             'details': traceback.format_exc()
         }), 500
-
+    
 def main():
     """Initialize and run the Flask application."""
     parser = argparse.ArgumentParser()
