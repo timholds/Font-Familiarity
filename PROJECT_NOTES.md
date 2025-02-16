@@ -300,3 +300,14 @@ The labels in the npz file are off by one, so we need to subtract by one in the 
 [ X ] create some test scripts to create a few images per class, train 1 epoch and save the model, load the model and do inference
 - need a way to pass around class embedding file names
 
+----
+Get an open source character detection and segmentation model - font model should be able to sum across all the softmax values characters in the image and return the most likely font
+
+
+
+[ ] get the model to train on a small dataset of 10 classes and 100 images per class
+[ ] get the
+
+Put on the front page:
+crop your image so that there is only one font present
+Upload an image or screenshot
